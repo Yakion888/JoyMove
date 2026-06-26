@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'搜索: ' + ${keyword} + ' - 悦动宝'">搜索 - 悦动宝 JoyMove</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <h5 class="fw-bold mb-3">🔍 搜索 "<span th:text="${keyword}">关键词</span>"</h5>
+
+            <div th:if="${moments != null and !moments.isEmpty()}">
+                <div class="card joy-card mb-3" th:each="m : ${moments}"
+                     th:onclick="'window.location=\'/moment/' + ${m.id} + '\''" style="cursor:pointer;">
+                    <img th:if="${m.imageUrl != null}" th:src="${m.imageUrl}"
+                         style="width:100%;height:200px;object-fit:cover;border-radius:16px 16px 0 0;"
+                         alt="运动照片" onerror="this.style.display='none'">
+                    <div class="card-body">
+                        <span class="badge badge-joy" th:if="${m.projectName != null}"
+                              th:text="${m.projectName}">项目</span>
+                        <span th:if="${m.emotion == 1}">😄</span>
+                        <span th:if="${m.emotion == 2}">😊</span>
+                        <span th:if="${m.emotion == 3}">😐</span>
+                        <span th:if="${m.emotion == 4}">😓</span>
+                        <p class="mt-2 mb-1" th:text="${#strings.abbreviate(m.content, 120)}">内容</p>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>👤 <span th:text="${m.authorNickname}">作者</span></span>
+                            <span>
+                                📅 <span th:text="${m.recordDate}">日期</span>
+                                · ❤️ <span th:text="${m.likeCount}">0</span>
+                                · 💬 <span th:text="${m.commentCount}">0</span>
+                                · ⭐<span th:text="${m.stars}">0</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <nav th:if="${totalPages != null and totalPages > 1}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage <= 1} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/search(keyword=${keyword},page=${currentPage-1})}">上一页</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                            th:classappend="${i == currentPage} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/search(keyword=${keyword},page=${i})}" th:text="${i}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage >= totalPages} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/search(keyword=${keyword},page=${currentPage+1})}">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div th:unless="${moments != null and !moments.isEmpty()}" class="text-center py-5 text-muted">
+                <div class="emoji-lg mb-2">🔍</div>
+                <h5>未找到相关内容</h5>
+                <p>试试其他关键词，或者浏览<a href="/community">社区动态</a></p>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card joy-card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold">🔍 重新搜索</h6>
+                    <form th:action="@{/search}" method="get" class="input-group">
+                        <input class="form-control" type="search" name="keyword" th:value="${keyword}" placeholder="搜索运动记录...">
+                        <button class="btn btn-joy" type="submit">搜索</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

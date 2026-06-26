@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区 - 悦动宝 JoyMove</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- 左侧：信息流 -->
+        <div class="col-lg-8">
+            <h4 class="fw-bold mb-3">🔥 社区动态</h4>
+
+            <!-- 标签筛选 -->
+            <div class="d-flex flex-wrap gap-1 mb-3" id="tagFilter">
+                <span class="tag-joy active-tag" data-tag="" style="cursor:pointer;">全部</span>
+            </div>
+
+            <div id="feedList"></div>
+            <div class="text-center py-3" id="loadingMore" style="display:none;">
+                <button class="btn btn-joy-outline" id="loadMoreBtn">加载更多</button>
+            </div>
+        </div>
+
+        <!-- 右侧：热门标签 + 快捷入口 -->
+        <div class="col-lg-4">
+            <div class="card joy-card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold">🏷️ 热门话题</h6>
+                    <div class="d-flex flex-wrap gap-1" id="hotTagsSidebar"></div>
+                </div>
+            </div>
+            <div class="card joy-card" sec:authorize="isAuthenticated()">
+                <div class="card-body text-center">
+                    <p class="mb-2">有新的运动瞬间？</p>
+                    <a href="/checkin" class="btn btn-joy w-100">✅ 去打卡分享</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script th:inline="javascript">
+var currentPage = 1, activeTag = '';
+
+// ====== 热门标签 ======
+$.get('/api/community/hot-tags', function(res) {
+    if (res.code !== 200) return;
+    var tags = res.data || [];
+    var html = '';
+    tags.forEach(function(t) {
+        html += '<span class="tag-joy" onclick="filterByTag(\'' + t + '\')" style="cursor:pointer;">#' + t + '</span>';
+    });
+    $('#tagFilter').append(html);
+    $('#hotTagsSidebar').html(html || '<small class="text-muted">暂无话题</small>');
+});
+
+// ====== 加载信息流 ======
+function loadFeed(page, tag, append) {
+    $.get('/api/community/feed', { page: page, size: 5, tag: tag || '' }, function(res) {
+        if (res.code !== 200) return;
+        var data = res.data;
+        var html = '';
+        (data.records || []).forEach(function(m) {
+            var tags = (m.tags || '').split(',').filter(Boolean);
+            var tagHtml = '';
+            tags.forEach(function(t) {
+                tagHtml += '<span class="badge bg-light text-dark me-1" onclick="event.stopPropagation();filterByTag(\'' + t.trim() + '\')" style="cursor:pointer;">#' + t.trim() + '</span>';
+            });
+
+            html += '<div class="card joy-card mb-3">' +
+                (m.imageUrl ? '<img src="' + m.imageUrl + '" style="width:100%;height:240px;object-fit:cover;border-radius:16px 16px 0 0;" onerror="this.style.display=\'none\'">' : '') +
+                '<div class="card-body">' +
+                '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                '<div><span class="fw-bold">' + (m.authorNickname || '用户') + '</span>' +
+                (m.childName ? ' <small class="text-muted">· 👶' + m.childName + '</small>' : '') +
+                (m.childAgeAtMoment ? ' <small>(' + m.childAgeAtMoment + '岁)</small>' : '') + '</div>' +
+                '<small class="text-muted">' + (m.recordDate || '') + '</small>' +
+                '</div>' +
+                '<p class="mb-2">' + (m.content || '').substring(0, 200) + '</p>' +
+                (tagHtml ? '<div class="mb-2">' + tagHtml + '</div>' : '') +
+                '<div class="d-flex justify-content-between align-items-center">' +
+                '<div>' +
+                '<span class="badge badge-joy me-2">' + (m.projectName || '') + '</span>' +
+                (m.emotion === 1 ? '😄' : m.emotion === 2 ? '😊' : m.emotion === 3 ? '😐' : m.emotion === 4 ? '😓' : '') +
+                '</div>' +
+                '<div class="btn-group btn-group-sm">' +
+                '<button class="btn btn-sm btn-joy-outline like-btn" data-id="' + m.id + '">❤️ <span class="like-count">' + (m.likeCount || 0) + '</span></button>' +
+                '<button class="btn btn-sm btn-joy-outline comment-btn" data-id="' + m.id + '">💬 <span class="comment-count">' + (m.commentCount || 0) + '</span></button>' +
+                '</div></div>' +
+                '<div class="comment-box mt-2 d-none" id="commentBox-' + m.id + '">' +
+                '<div class="comment-list-' + m.id + ' small mb-2"></div>' +
+                '<div class="input-group input-group-sm">' +
+                '<input type="text" class="form-control comment-input-' + m.id + '" placeholder="写评论...">' +
+                '<button class="btn btn-joy submit-comment" data-id="' + m.id + '">发送</button>' +
+                '</div></div>' +
+                '</div></div>';
+        });
+
+        if (append) {
+            $('#feedList').append(html);
+        } else {
+            $('#feedList').html(html);
+        }
+
+        if (data.current < data.pages) {
+            $('#loadingMore').show();
+            $('#loadMoreBtn').data('page', data.current + 1);
+        } else {
+            $('#loadingMore').hide();
+        }
+    });
+}
+
+// ====== 标签筛选 ======
+function filterByTag(tag) {
+    activeTag = tag; currentPage = 1;
+    $('.active-tag').removeClass('active-tag'); // visual feedback
+    $('.tag-joy').each(function() { $(this).toggleClass('active-tag', $(this).text().trim() === (tag || '全部')); });
+    loadFeed(1, tag, false);
+}
+
+$('#loadMoreBtn').click(function() {
+    var page = $(this).data('page') || 2;
+    loadFeed(page, activeTag, true);
+    currentPage = page;
+});
+
+// ====== 点赞 ======
+$(document).on('click', '.like-btn', function() {
+    var btn = $(this);
+    $.post('/api/community/like', { momentId: btn.data('id') }, function(res) {
+        if (res.code === 200) {
+            var count = parseInt(btn.find('.like-count').text()) || 0;
+            btn.find('.like-count').text(res.data === '已点赞' ? count + 1 : Math.max(0, count - 1));
+        }
+    });
+});
+
+// ====== 评论 ======
+$(document).on('click', '.comment-btn', function() {
+    var id = $(this).data('id');
+    $('#commentBox-' + id).toggleClass('d-none');
+    if (!$('#commentBox-' + id).hasClass('d-none')) {
+        loadComments(id);
+    }
+});
+
+$(document).on('click', '.submit-comment', function() {
+    var id = $(this).data('id');
+    var input = $('.comment-input-' + id);
+    var content = input.val().trim();
+    if (!content) return;
+    $.post('/api/community/comment', { momentId: id, content: content }, function(res) {
+        if (res.code === 200) {
+            input.val('');
+            loadComments(id);
+        }
+    });
+});
+
+function loadComments(momentId) {
+    $.get('/api/community/comments', { momentId: momentId }, function(res) {
+        if (res.code !== 200) return;
+        var html = '';
+        (res.data || []).forEach(function(c) {
+            html += '<div style="margin-left:' + (c.depth * 16) + 'px" class="mb-1">' +
+                '<strong>' + (c.nickname || '用户') + '</strong> ' + (c.content || '') + '</div>';
+        });
+        $('.comment-list-' + momentId).html(html || '<div class="text-muted">暂无评论</div>');
+    });
+}
+
+// ====== 初始加载 ======
+loadFeed(1, '', false);
+</script>
+</body>
+</html>

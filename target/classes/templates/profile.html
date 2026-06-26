@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 悦动宝 JoyMove</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- 左侧：个人信息 -->
+        <div class="col-lg-5">
+            <div class="card joy-card mb-3">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">👤 个人信息</h5>
+                    <form id="profileForm">
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">昵称</label>
+                            <input type="text" class="form-control" id="nickname" th:value="${user.nickname}">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">手机号</label>
+                            <input type="text" class="form-control" id="phone" th:value="${user.phone}" placeholder="选填">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">城市</label>
+                            <input type="text" class="form-control" id="city" th:value="${user.city}" placeholder="如：北京">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">简介</label>
+                            <textarea class="form-control" id="bio" rows="2" th:text="${user.bio}" placeholder="一句话介绍自己"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">我是</label>
+                            <div class="btn-group w-100">
+                                <input type="radio" class="btn-check" name="familyRole" value="0" id="r0"
+                                       th:checked="${user.familyRole == null or user.familyRole == 0}">
+                                <label class="btn btn-outline-primary btn-sm" for="r0">👨 爸爸</label>
+                                <input type="radio" class="btn-check" name="familyRole" value="1" id="r1"
+                                       th:checked="${user.familyRole == 1}">
+                                <label class="btn btn-outline-primary btn-sm" for="r1">👩 妈妈</label>
+                                <input type="radio" class="btn-check" name="familyRole" value="2" id="r2"
+                                       th:checked="${user.familyRole == 2}">
+                                <label class="btn btn-outline-primary btn-sm" for="r2">👪 其他</label>
+                            </div>
+                        </div>
+                        <div class="alert alert-success d-none" id="profileOk"></div>
+                        <button type="submit" class="btn btn-joy w-100">保存</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="card joy-card">
+                <div class="card-body text-center row">
+                    <div class="col-4">
+                        <div class="stat-number" th:text="${user.totalDays != null ? user.totalDays : 0}">0</div>
+                        <div class="stat-label">累计运动天数</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-number" th:text="${user.longestStreak != null ? user.longestStreak : 0}">0</div>
+                        <div class="stat-label">🔥 最长连续</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-number" th:text="${#lists.size(children)}">0</div>
+                        <div class="stat-label">👶 孩子数</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：孩子管理 -->
+        <div class="col-lg-7">
+            <div class="card joy-card mb-3">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">👶 我的孩子</h5>
+
+                    <div th:if="${children != null and !children.isEmpty()}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3" th:each="child : ${children}">
+                                <div class="card border p-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong th:text="${child.name}">孩子名</strong>
+                                            <span class="badge bg-info ms-1" th:text="${child.gender == 0 ? '👦男' : '👧女'}">性别</span>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-secondary edit-child-btn"
+                                                th:attr="data-id=${child.id},data-name=${child.name},data-gender=${child.gender},data-birth=${child.birthDate}">
+                                            ✏️
+                                        </button>
+                                    </div>
+                                    <small class="text-muted" th:if="${child.birthDate != null}">
+                                        🎂 <span th:text="${child.birthDate}">生日</span>
+                                        (<span th:text="${#temporals.createNow().getYear() - child.birthDate.getYear()} + '岁'"></span>)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:unless="${children != null and !children.isEmpty()}" class="text-center py-3 text-muted">
+                        <p>还没有添加孩子信息，添加后可以开始记录亲子运动</p>
+                    </div>
+
+                    <hr>
+                    <h6 class="fw-bold" id="childFormTitle">➕ 添加孩子</h6>
+                    <form id="childForm" class="row g-2">
+                        <input type="hidden" id="editChildId" value="">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="childName2" placeholder="孩子昵称" required>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="childGender2">
+                                <option value="0">👦 男孩</option>
+                                <option value="1">👧 女孩</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" class="form-control" id="childBirth2">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-joy w-100" id="childSubmitBtn">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 快捷入口 -->
+            <div class="row g-2">
+                <div class="col-6">
+                    <a href="/checkin" class="btn btn-joy w-100 py-3">✅ 去打卡</a>
+                </div>
+                <div class="col-6">
+                    <a href="/moment/publish" class="btn btn-joy-outline w-100 py-3">✍️ 记录运动</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script th:inline="javascript">
+// Profile update
+$('#profileForm').on('submit', function(e) {
+    e.preventDefault();
+    $.post('/user/profile/update', {
+        nickname: $('#nickname').val(), phone: $('#phone').val(),
+        city: $('#city').val(), bio: $('#bio').val(),
+        familyRole: $('input[name=familyRole]:checked').val()
+    }, function(res) {
+        $('#profileOk').removeClass('d-none').text('保存成功！').fadeOut(2000, function(){ $(this).removeClass('d-none').text(''); });
+    });
+});
+
+// Child form
+$('#childForm').on('submit', function(e) {
+    e.preventDefault();
+    var childId = $('#editChildId').val();
+    var data = {
+        name: $('#childName2').val(), gender: $('#childGender2').val(),
+        birthDate: $('#childBirth2').val()
+    };
+    var url = childId ? '/user/child/update' : '/user/child/add';
+    if (childId) data.childId = childId;
+    $.post(url, data, function(res) {
+        location.reload();
+    });
+});
+
+// Edit child button
+$('.edit-child-btn').click(function() {
+    var btn = $(this);
+    $('#editChildId').val(btn.data('id'));
+    $('#childName2').val(btn.data('name'));
+    $('#childGender2').val(btn.data('gender'));
+    $('#childBirth2').val(btn.data('birth'));
+    $('#childFormTitle').text('✏️ 编辑孩子信息');
+    $('#childSubmitBtn').text('更新');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>悦动宝 JoyMove — 亲子运动陪伴平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- 导航栏 -->
+<div th:replace="fragments/header :: navbar"></div>
+
+<!-- Hero -->
+<div class="joy-hero">
+    <div class="container">
+        <h1>🏃 悦动宝 <span style="color:var(--joy-accent);">JoyMove</span></h1>
+        <p class="lead mt-2">让运动成为家庭最温暖的陪伴</p>
+        <p class="text-muted">智能推荐亲子运动 · 记录成长每一刻 · 勋章激励好习惯</p>
+        <div class="mt-4" sec:authorize="!isAuthenticated()">
+            <a href="/register" class="btn btn-joy btn-lg me-2">🚀 免费加入</a>
+            <a href="/projects" class="btn btn-joy-outline btn-lg">📋 看看怎么玩</a>
+        </div>
+        <div class="mt-4" sec:authorize="isAuthenticated()">
+            <a href="/checkin" class="btn btn-joy btn-lg me-2">✅ 今日打卡</a>
+            <a href="/moment/publish" class="btn btn-joy-outline btn-lg">✍️ 记录运动</a>
+        </div>
+    </div>
+</div>
+
+<!-- 主体 -->
+<div class="container mt-4">
+    <div class="row">
+
+        <!-- 左侧：运动记录流 -->
+        <div class="col-lg-8">
+            <h5 class="fw-bold mb-3">🔥 社区动态</h5>
+
+            <div th:if="${moments != null and !moments.isEmpty()}">
+                <div class="card joy-card mb-3" th:each="m : ${moments}"
+                     th:onclick="'window.location=\'/moment/' + ${m.id} + '\''"
+                     style="cursor:pointer;">
+                    <img th:if="${m.imageUrl != null}" th:src="${m.imageUrl}"
+                         style="width:100%;height:240px;object-fit:cover;border-radius:16px 16px 0 0;"
+                         alt="运动照片" onerror="this.style.display='none'">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span th:if="${m.emotion == 1}">😄</span>
+                                <span th:if="${m.emotion == 2}">😊</span>
+                                <span th:if="${m.emotion == 3}">😐</span>
+                                <span th:if="${m.emotion == 4}">😓</span>
+                                <span class="badge badge-joy ms-2" th:if="${m.projectName != null}"
+                                      th:text="${m.projectName}">项目</span>
+                            </div>
+                            <small class="text-muted">⭐<span th:text="${m.stars}">5</span></small>
+                        </div>
+                        <p class="mt-2 mb-1" th:text="${#strings.abbreviate(m.content, 120)}">内容...</p>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>👤 <span th:text="${m.authorNickname}">作者</span>
+                                <span th:if="${m.childName != null}">· 👶 <span th:text="${m.childName}">孩子</span></span>
+                            </span>
+                            <span>
+                                <span th:if="${m.location != null}">📍 <span th:text="${m.location}"></span> · </span>
+                                📅 <span th:text="${m.recordDate}">日期</span>
+                                · ❤️ <span th:text="${m.likeCount}">0</span>
+                                · 💬 <span th:text="${m.commentCount}">0</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分页 -->
+                <nav th:if="${totalPages != null and totalPages > 1}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage <= 1 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/(page=${currentPage - 1}, projectId=${projectId})}">上一页</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                            th:classappend="${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/(page=${i}, projectId=${projectId})}" th:text="${i}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage >= totalPages ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/(page=${currentPage - 1}, projectId=${projectId})}">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div th:unless="${moments != null and !moments.isEmpty()}" class="text-center py-5 text-muted">
+                <div class="emoji-lg mb-2">📭</div>
+                <h5>还没有运动记录</h5>
+                <p>成为第一个分享亲子运动瞬间的家长吧！</p>
+                <a href="/moment/publish" class="btn btn-joy" sec:authorize="isAuthenticated()">记录第一次运动</a>
+                <a href="/register" class="btn btn-joy" sec:authorize="!isAuthenticated()">注册并开始</a>
+            </div>
+        </div>
+
+        <!-- 右侧：侧边栏 -->
+        <div class="col-lg-4">
+            <!-- 运动项目标签云 -->
+            <div class="card joy-card mb-3" th:if="${projects != null and !projects.isEmpty()}">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">📋 热门运动项目</h6>
+                    <div>
+                        <a th:each="p : ${projects}" class="tag-joy"
+                           th:href="@{/(projectId=${p.id})}"
+                           th:text="${p.name}">项目</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快捷入口 -->
+            <div class="card joy-card mb-3" sec:authorize="isAuthenticated()">
+                <div class="card-body text-center">
+                    <p class="mb-2 fw-bold">今天运动了吗？</p>
+                    <a href="/checkin" class="btn btn-joy w-100 mb-2">✅ 立即打卡</a>
+                    <a href="/moment/publish" class="btn btn-joy-outline w-100">✍️ 记录运动瞬间</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审核管理 - 悦动宝 JoyMove</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4">
+    <h4 class="fw-bold mb-3">⚙️ 审核管理</h4>
+
+    <!-- 统计卡片 -->
+    <div class="row mb-3" id="statsRow">
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card joy-card text-center p-2"><div class="stat-number" id="statUsers">0</div><div class="stat-label">总用户</div></div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card joy-card text-center p-2"><div class="stat-number" id="statMoments">0</div><div class="stat-label">总记录</div></div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card joy-card text-center p-2"><div class="stat-number text-warning" id="statPending">0</div><div class="stat-label">待审核</div></div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card joy-card text-center p-2"><div class="stat-number" id="statProjects">0</div><div class="stat-label">运动项目</div></div>
+        </div>
+    </div>
+
+    <!-- 标签切换 -->
+    <ul class="nav nav-tabs mb-3" id="adminTabs">
+        <li class="nav-item"><a class="nav-link active" data-tab="audit" href="#">📝 内容审核</a></li>
+        <li class="nav-item"><a class="nav-link" data-tab="projects" href="#">📋 项目管理</a></li>
+    </ul>
+
+    <!-- 审核面板 -->
+    <div id="tab-audit">
+        <div class="btn-group mb-3" id="statusFilter">
+            <button class="btn btn-sm btn-joy active" data-status="0">⏳ 待审核</button>
+            <button class="btn btn-sm btn-joy-outline" data-status="1">✅ 已发布</button>
+            <button class="btn btn-sm btn-joy-outline" data-status="2">❌ 已驳回</button>
+        </div>
+        <div id="auditList"></div>
+    </div>
+
+    <!-- 项目管理面板 -->
+    <div id="tab-projects" class="d-none">
+        <button class="btn btn-joy btn-sm mb-3" onclick="showProjectForm()">+ 添加项目</button>
+        <div id="projectEditForm" class="card joy-card mb-3 p-3 d-none">
+            <input type="hidden" id="editProjectId">
+            <div class="row g-2">
+                <div class="col-md-3"><input class="form-control form-control-sm" id="pName" placeholder="项目名称"></div>
+                <div class="col-md-1"><input class="form-control form-control-sm" id="pAgeMin" type="number" placeholder="最小年龄"></div>
+                <div class="col-md-1"><input class="form-control form-control-sm" id="pAgeMax" type="number" placeholder="最大年龄"></div>
+                <div class="col-md-1"><input class="form-control form-control-sm" id="pDurMin" type="number" placeholder="最短min"></div>
+                <div class="col-md-1"><input class="form-control form-control-sm" id="pDurMax" type="number" placeholder="最长min"></div>
+                <div class="col-md-2"><input class="form-control form-control-sm" id="pEquip" placeholder="装备"></div>
+                <div class="col-md-1"><input class="form-control form-control-sm" id="pDiff" type="number" min="1" max="5" placeholder="难度1-5"></div>
+                <div class="col-md-1">
+                    <select class="form-select form-select-sm" id="pType"><option value="1">户外</option><option value="2">室内</option><option value="3">皆可</option></select>
+                </div>
+                <div class="col-md-4 mt-1"><input class="form-control form-control-sm" id="pDesc" placeholder="描述"></div>
+                <div class="col-md-2 mt-1"><input class="form-control form-control-sm" id="pTags" placeholder="能力标签(逗号分隔)"></div>
+                <div class="col-md-1 mt-1">
+                    <select class="form-select form-select-sm" id="pSeason"><option value="5">全年</option><option value="1">春</option><option value="2">夏</option><option value="3">秋</option><option value="4">冬</option></select>
+                </div>
+                <div class="col-md-1 mt-1">
+                    <select class="form-select form-select-sm" id="pStatus"><option value="1">启用</option><option value="0">禁用</option></select>
+                </div>
+                <div class="col-md-2 mt-2">
+                    <button class="btn btn-joy btn-sm w-100" onclick="saveProject()">保存</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead><tr><th>名称</th><th>年龄</th><th>时长</th><th>类型</th><th>难度</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody id="projectTable"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script th:inline="javascript">
+// ====== Tab切换 ======
+$('#adminTabs a').click(function(e) {
+    e.preventDefault();
+    $('#adminTabs a').removeClass('active');
+    $(this).addClass('active');
+    var tab = $(this).data('tab');
+    $('#tab-audit').toggleClass('d-none', tab !== 'audit');
+    $('#tab-projects').toggleClass('d-none', tab !== 'projects');
+    if (tab === 'audit') loadAuditList(0);
+    if (tab === 'projects') loadProjects();
+});
+
+// ====== 统计 ======
+function loadStats() {
+    $.get('/admin/api/stats', function(res) {
+        if (res.code === 200) {
+            var s = res.data;
+            $('#statUsers').text(s.userCount || 0);
+            $('#statMoments').text(s.momentCount || 0);
+            $('#statPending').text(s.pendingCount || 0);
+            $('#statProjects').text(s.projectCount || 0);
+        }
+    });
+}
+
+// ====== 审核列表 ======
+function loadAuditList(status) {
+    $.get('/admin/api/moments?status=' + status, function(res) {
+        if (res.code !== 200) return;
+        var html = '';
+        (res.data || []).forEach(function(m) {
+            html += '<div class="card joy-card mb-2"><div class="card-body py-2 px-3">' +
+                '<div class="d-flex justify-content-between align-items-center">' +
+                '<div><strong>' + (m.title || m.content || '').substring(0, 30) + '</strong>' +
+                '<br><small class="text-muted">👤 用户' + m.userId + ' 📅' + (m.recordDate || '') +
+                ' 📍' + (m.location || '') + ' ⭐' + (m.stars || '') + '</small></div>' +
+                '<div class="btn-group btn-group-sm">';
+            if (m.status === 0) {
+                html += '<button class="btn btn-success btn-sm" onclick="audit(' + m.id + ',1)">✅ 通过</button>' +
+                    '<button class="btn btn-warning btn-sm" onclick="rejectMoment(' + m.id + ')">❌ 驳回</button>';
+            } else if (m.status === 2) {
+                html += '<span class="text-danger small">驳回: ' + (m.rejectReason || '') + '</span>';
+            }
+            html += '<button class="btn btn-danger btn-sm" onclick="deleteMoment(' + m.id + ')">🗑️</button>' +
+                '</div></div></div></div>';
+        });
+        $('#auditList').html(html || '<p class="text-muted">暂无记录</p>');
+    });
+}
+
+$('#statusFilter button').click(function() {
+    $('#statusFilter button').removeClass('active btn-joy').addClass('btn-joy-outline');
+    $(this).addClass('active btn-joy').removeClass('btn-joy-outline');
+    loadAuditList($(this).data('status'));
+});
+
+function audit(id, status) {
+    $.post('/admin/activity/audit', { momentId: id, status: status }, function(res) {
+        if (res.code === 200) loadAuditList(0);
+    });
+}
+
+function rejectMoment(id) {
+    var reason = prompt('驳回理由：');
+    if (reason) {
+        $.post('/admin/activity/audit', { momentId: id, status: 2, rejectReason: reason }, function(res) {
+            if (res.code === 200) loadAuditList(0);
+        });
+    }
+}
+
+function deleteMoment(id) {
+    if (confirm('确定永久删除？不可恢复！')) {
+        $.ajax({ url: '/admin/activities/' + id + '/permanent', type: 'DELETE', success: function(res) {
+            if (res.code === 200) loadAuditList(0);
+        }});
+    }
+}
+
+// ====== 项目管理 ======
+function loadProjects() {
+    $.get('/api/projects', function(res) {
+        if (res.code !== 200) return;
+        var typeMap = {1:'户外',2:'室内',3:'皆可'};
+        var html = '';
+        (res.data || []).forEach(function(p) {
+            html += '<tr><td>' + p.name + '</td><td>' + p.ageRangeMin + '-' + p.ageRangeMax + '</td>' +
+                '<td>' + p.durationMin + '-' + p.durationMax + 'min</td><td>' + (typeMap[p.activityType]||'') + '</td>' +
+                '<td>' + p.difficultyLevel + '</td><td>' + (p.status === 1 ? '✅' : '⛔') + '</td>' +
+                '<td><button class="btn btn-sm btn-outline-secondary" onclick="editProject(' + p.id + ')">✏️</button> ' +
+                '<button class="btn btn-sm btn-outline-danger" onclick="deleteProject(' + p.id + ')">🗑️</button></td></tr>';
+        });
+        $('#projectTable').html(html);
+    });
+}
+
+function showProjectForm() {
+    $('#projectEditForm').toggleClass('d-none');
+    $('#editProjectId').val('');
+}
+
+function editProject(id) {
+    $.get('/api/projects', function(res) {
+        var p = (res.data || []).find(function(x) { return x.id === id; });
+        if (!p) return;
+        $('#editProjectId').val(p.id);
+        $('#pName').val(p.name);
+        $('#pAgeMin').val(p.ageRangeMin);
+        $('#pAgeMax').val(p.ageRangeMax);
+        $('#pDurMin').val(p.durationMin);
+        $('#pDurMax').val(p.durationMax);
+        $('#pEquip').val(p.equipment);
+        $('#pDiff').val(p.difficultyLevel);
+        $('#pType').val(p.activityType);
+        $('#pDesc').val(p.description);
+        $('#pTags').val(p.abilityTags);
+        $('#pSeason').val(p.seasonRecommend);
+        $('#pStatus').val(p.status);
+        $('#projectEditForm').removeClass('d-none');
+    });
+}
+
+function saveProject() {
+    var data = {
+        id: $('#editProjectId').val() || null,
+        name: $('#pName').val(), ageRangeMin: $('#pAgeMin').val(), ageRangeMax: $('#pAgeMax').val(),
+        durationMin: $('#pDurMin').val(), durationMax: $('#pDurMax').val(),
+        equipment: $('#pEquip').val(), difficultyLevel: $('#pDiff').val(),
+        activityType: $('#pType').val(), description: $('#pDesc').val(),
+        abilityTags: $('#pTags').val(), seasonRecommend: $('#pSeason').val(),
+        status: $('#pStatus').val()
+    };
+    if (!data.name) return alert('请输入项目名称');
+    $.ajax({
+        url: '/admin/api/project/save', type: 'POST', contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(res) {
+            if (res.code === 200) { $('#projectEditForm').addClass('d-none'); loadProjects(); }
+        }
+    });
+}
+
+function deleteProject(id) {
+    if (confirm('确定删除？')) {
+        $.post('/admin/api/project/delete', { id: id }, function(res) {
+            if (res.code === 200) loadProjects();
+        });
+    }
+}
+
+// 初始化
+loadStats();
+loadAuditList(0);
+</script>
+</body>
+</html>

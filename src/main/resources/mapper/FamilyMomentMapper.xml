@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sportsblog.mapper.FamilyMomentMapper">
+
+    <resultMap id="BaseResultMap" type="com.sportsblog.entity.FamilyMoment">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="child_id" property="childId"/>
+        <result column="child_age_at_moment" property="childAgeAtMoment"/>
+        <result column="duration" property="duration"/>
+        <result column="location" property="location"/>
+        <result column="content" property="content"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="emotion" property="emotion"/>
+        <result column="stars" property="stars"/>
+        <result column="status" property="status"/>
+        <result column="is_public" property="isPublic"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="record_date" property="recordDate"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectPublishedPage" resultMap="BaseResultMap">
+        SELECT * FROM family_moment
+        WHERE status = 1 AND is_public = 1 AND is_deleted = 0
+        <if test="projectId != null">
+            AND project_id = #{projectId}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectDetailById" resultMap="BaseResultMap">
+        SELECT * FROM family_moment WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <update id="incrementLikeCount">
+        UPDATE family_moment SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="incrementCommentCount">
+        UPDATE family_moment SET comment_count = comment_count + 1 WHERE id = #{id}
+    </update>
+
+    <select id="selectByUserIdPage" resultMap="BaseResultMap">
+        SELECT * FROM family_moment
+        WHERE user_id = #{userId} AND is_deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="searchPublished" resultMap="BaseResultMap">
+        SELECT * FROM family_moment
+        WHERE status = 1 AND is_public = 1 AND is_deleted = 0
+        AND (content LIKE CONCAT('%', #{keyword}, '%')
+             OR location LIKE CONCAT('%', #{keyword}, '%'))
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*) FROM family_moment
+        WHERE user_id = #{userId} AND is_deleted = 0 AND status = 1
+    </select>
+
+    <select id="countDistinctProjects" resultType="int">
+        SELECT COUNT(DISTINCT project_id) FROM family_moment
+        WHERE user_id = #{userId} AND is_deleted = 0 AND status = 1
+    </select>
+
+    <select id="countByProjectId" resultType="int">
+        SELECT COUNT(*) FROM family_moment
+        WHERE user_id = #{userId} AND project_id = #{projectId}
+        AND is_deleted = 0 AND status = 1
+    </select>
+
+    <select id="countByProjectIds" resultType="int">
+        SELECT COUNT(*) FROM family_moment
+        WHERE user_id = #{userId} AND is_deleted = 0 AND status = 1
+        AND project_id IN
+        <foreach collection="projectIds" item="pid" open="(" separator="," close=")">
+            #{pid}
+        </foreach>
+    </select>
+
+    <select id="countByEmotion" resultType="int">
+        SELECT COUNT(*) FROM family_moment
+        WHERE user_id = #{userId} AND emotion = #{emotion}
+        AND is_deleted = 0 AND status = 1
+    </select>
+
+    <select id="selectByUserIdAndMonth" resultMap="BaseResultMap">
+        SELECT fm.* FROM family_moment fm
+        WHERE fm.user_id = #{userId} AND fm.is_deleted = 0 AND fm.status = 1
+        AND YEAR(fm.record_date) = #{year} AND MONTH(fm.record_date) = #{month}
+        ORDER BY fm.record_date ASC
+    </select>
+
+    <select id="countDistinctRecordDates" resultType="int">
+        SELECT COUNT(DISTINCT record_date) FROM family_moment
+        WHERE user_id = #{userId} AND is_deleted = 0 AND status = 1
+    </select>
+
+    <select id="selectDistinctRecordDates" resultType="java.lang.String">
+        SELECT DISTINCT record_date FROM family_moment
+        WHERE user_id = #{userId} AND is_deleted = 0 AND status = 1
+        ORDER BY record_date DESC
+    </select>
+
+    <select id="selectPending" resultMap="BaseResultMap">
+        SELECT * FROM family_moment WHERE status = 0 AND is_deleted = 0 ORDER BY create_time ASC
+    </select>
+
+    <select id="selectByStatus" resultMap="BaseResultMap">
+        SELECT * FROM family_moment WHERE status = #{status} AND is_deleted = 0 ORDER BY create_time DESC
+    </select>
+
+</mapper>

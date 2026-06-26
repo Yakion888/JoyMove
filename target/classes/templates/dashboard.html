@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据看板 - 悦动宝 JoyMove</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4">
+    <h4 class="fw-bold mb-3">📊 运动数据看板</h4>
+
+    <!-- KPI 卡片 -->
+    <div class="row mb-4" id="kpiCards">
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card joy-card text-center p-3">
+                <div class="emoji-md">🏃</div>
+                <div class="stat-number" id="kpiWeekly">0</div>
+                <div class="stat-label">本周运动次数</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card joy-card text-center p-3">
+                <div class="emoji-md">⏱️</div>
+                <div class="stat-number" id="kpiDuration">0</div>
+                <div class="stat-label">本周时长(分钟)</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card joy-card text-center p-3">
+                <div class="emoji-md">🔥</div>
+                <div class="stat-number" id="kpiStreak">0</div>
+                <div class="stat-label">连续打卡天数</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card joy-card text-center p-3">
+                <div class="emoji-md">🏅</div>
+                <div class="stat-number" id="kpiMedals">0</div>
+                <div class="stat-label">已获勋章</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图表区 -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="card joy-card"><div class="card-body"><h6 class="fw-bold">📊 月度运动次数</h6><div id="barChart" style="height:280px;"></div></div></div>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <div class="card joy-card"><div class="card-body"><h6 class="fw-bold">⏱️ 月度运动时长</h6><div id="durationChart" style="height:280px;"></div></div></div>
+        </div>
+    </div>
+
+    <!-- 勋章墙 -->
+    <div class="card joy-card mb-4">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3">🏅 勋章墙</h6>
+            <div class="row" id="medalWall"></div>
+        </div>
+    </div>
+
+    <!-- 成长时间线 -->
+    <div class="card joy-card">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3">🌱 成长时间线</h6>
+            <div id="timeline"></div>
+        </div>
+    </div>
+
+    <!-- AI 成长报告 -->
+    <div class="card joy-card mt-4" id="aiReportCard" style="display:none;">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">🤖 AI 成长报告</h6>
+                <div class="d-flex gap-2 align-items-center">
+                    <select class="form-select form-select-sm" id="reportChildId" style="width:auto;"></select>
+                    <button class="btn btn-joy btn-sm" onclick="loadReport()" id="regenReportBtn">🔄 重新生成</button>
+                </div>
+            </div>
+            <div id="aiReportContent"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script th:inline="javascript">
+// ====== 加载看板数据 ======
+$.get('/api/dashboard/overview', function(res) {
+    if (res.code !== 200) return;
+    var d = res.data;
+
+    // KPI
+    var ws = d.weeklyStats || {};
+    $('#kpiWeekly').text(ws.weeklyCount || 0);
+    $('#kpiDuration').text(ws.weeklyDuration || 0);
+    var si = d.streakInfo || {};
+    $('#kpiStreak').text(si.currentStreak || 0);
+    var ms = d.medalSummary || {};
+    $('#kpiMedals').text(ms.earnedCount || 0);
+
+    // 勋章墙（放在饼图前面，确保不受图表错误影响）
+    var medalHtml = '';
+    (ms.medals || []).forEach(function(m) {
+        if (m.earned) {
+            medalHtml += '<div class="col-4 col-sm-2 text-center mb-2">' +
+                '<div class="p-2 rounded" style="background:#E8F5E9;border:2px solid #81C784;">' +
+                '<div class="emoji-md">' + (m.medalIcon || '🏅') + '</div>' +
+                '<small class="d-block fw-bold">' + m.medalName + '</small>' +
+                '<span class="badge bg-success">✅</span></div></div>';
+        } else {
+            medalHtml += '<div class="col-4 col-sm-2 text-center mb-2 opacity-50">' +
+                '<div class="p-2 rounded" style="background:#F5F5F5;">' +
+                '<div class="emoji-md">' + (m.medalIcon || '🏅') + '</div>' +
+                '<small class="d-block">' + m.medalName + '</small>' +
+                '<div class="progress mx-auto mt-1" style="width:50px;height:4px;"><div class="progress-bar bg-warning" style="width:' + m.progressPercent + '%"></div></div>' +
+                '<small class="text-muted" style="font-size:0.6rem;">' + m.currentProgress + '/' + m.conditionValue + '</small></div></div>';
+        }
+    });
+    $('#medalWall').html(medalHtml);
+
+    // 饼图
+    try {
+        var pieData = (d.projectDistribution || []).map(function(p) {
+            return { name: p.projectName, value: p.count };
+        });
+        if (pieData.length > 0) {
+            var pie = echarts.init(document.getElementById('pieChart'));
+            pie.setOption({
+                tooltip: { trigger: 'item' },
+                series: [{ type: 'pie', radius: ['40%', '70%'], data: pieData,
+                    label: { formatter: '{b}: {c}次' },
+                    color: ['#FFB74D','#81C784','#64B5F6','#E57373','#BA68C8','#FFD54F','#4DD0E1','#A1887F'] }]
+            });
+        }
+    } catch(e) {}
+});
+
+// ====== 趋势图（柱状+折线独立） ======
+$.get('/api/dashboard/trend', { months: 6 }, function(res) {
+    if (res.code !== 200) return;
+    var d = res.data;
+    var maxCount = Math.max.apply(null, d.counts.concat([1]));
+    var maxDur = Math.max.apply(null, d.durations.concat([1]));
+
+    var bar = echarts.init(document.getElementById('barChart'));
+    bar.setOption({
+        tooltip: { trigger: 'axis', formatter: '{b}<br/>运动次数: {c}次' },
+        grid: { left: 40, right: 20, top: 20, bottom: 30 },
+        xAxis: { type: 'category', data: d.months || [] },
+        yAxis: { type: 'value', minInterval: 1, max: maxCount + 1,
+                 axisLabel: { formatter: '{value}' }, splitLine: { show: false } },
+        series: [{ type: 'bar', data: d.counts || [], color: '#FFB74D', barWidth: '40%',
+                   label: { show: true, position: 'top', color: '#E65100', fontWeight: 'bold' } }]
+    });
+
+    var dur = echarts.init(document.getElementById('durationChart'));
+    dur.setOption({
+        tooltip: { trigger: 'axis', formatter: '{b}<br/>运动时长: {c}分钟' },
+        grid: { left: 40, right: 20, top: 20, bottom: 30 },
+        xAxis: { type: 'category', data: d.months || [] },
+        yAxis: { type: 'value', minInterval: 1, max: maxDur + 10,
+                 axisLabel: { formatter: '{value}' }, splitLine: { show: false } },
+        series: [{ type: 'line', data: d.durations || [], color: '#81C784', smooth: true,
+                   symbolSize: 10, symbol: 'circle',
+                   label: { show: true, position: 'top', color: '#2E7D32', formatter: '{c}min' },
+                   areaStyle: { color: 'rgba(129,199,132,0.15)' } }]
+    });
+});
+
+// ====== 成长时间线 ======
+$.get('/api/dashboard/timeline', function(res) {
+    if (res.code !== 200) return;
+    var nodes = (res.data || {}).nodes || [];
+    var html = '';
+    nodes.forEach(function(n, i) {
+        html += '<div class="d-flex mb-2">' +
+            '<div class="text-center me-3" style="min-width:80px;"><small class="text-muted">' + n.date + '</small></div>' +
+            '<div class="flex-grow-1 border-start border-3 ps-3 pb-2" style="border-color:var(--joy-primary)!important;">' +
+            '<strong>' + (n.projectName || '运动') + '</strong> ' +
+            (n.emotionEmoji || '') + ' ⭐'.repeat(n.stars || 0) +
+            (n.location ? ' <small class="text-muted">📍' + n.location + '</small>' : '') +
+            (n.content ? '<br><small class="text-muted">' + n.content.substring(0, 60) + '...</small>' : '') +
+            '</div></div>';
+    });
+    $('#timeline').html(html || '<p class="text-muted">还没有运动记录</p>');
+});
+
+// ====== AI 月报 ======
+var reportCache = {};
+
+// 加载孩子列表到报告区
+$.get('/api/user/children', function(res) {
+    if (res.code !== 200 || !res.data) return;
+    var opts = '';
+    res.data.forEach(function(c) {
+        opts += '<option value="' + c.id + '">' + c.name + '</option>';
+    });
+    $('#reportChildId').html(opts);
+    if (res.data.length > 0) {
+        $('#aiReportCard').show();
+        $('#reportChildId').val(res.data[0].id); // 默认第一个孩子
+        var cacheKey = res.data[0].id + '-' + new Date().getFullYear() + '-' + (new Date().getMonth()+1);
+        if (reportCache[cacheKey]) {
+            renderReport(reportCache[cacheKey]);
+        } else {
+            loadReport();
+        }
+    }
+});
+
+function loadReport() {
+    var childId = $('#reportChildId').val();
+    if (!childId) return;
+    var now = new Date();
+    var cacheKey = childId + '-' + now.getFullYear() + '-' + (now.getMonth()+1);
+
+    $('#regenReportBtn').prop('disabled', true).text('生成中...');
+    $('#aiReportContent').html('<div class="text-center py-4"><div class="spinner-border text-warning"></div><p class="small mt-2">AI 正在分析数据...</p></div>');
+
+    $.get('/api/ai/report', { childId: childId, year: now.getFullYear(), month: now.getMonth() + 1 }, function(res) {
+        $('#regenReportBtn').prop('disabled', false).text('🔄 重新生成');
+        if (res.code !== 200 || !res.data || !res.data.title) {
+            $('#aiReportContent').html('<div class="text-center py-3 text-muted">本月暂无运动数据，去<a href="/checkin">打卡</a>后再来生成报告吧</div>');
+            return;
+        }
+        reportCache[cacheKey] = res.data;
+        renderReport(res.data);
+    });
+}
+
+function renderReport(r) {
+    if (!r || !r.title) {
+        $('#aiReportContent').html('<div class="text-center py-3 text-muted">暂无数据</div>');
+        return;
+    }
+    var highlightsHtml = (r.highlights || []).map(function(h) {
+        return '<div class="d-flex align-items-start mb-1"><span class="text-warning me-2">✨</span><span>' + h + '</span></div>';
+    }).join('');
+
+    var html =
+        '<div class="mb-3 pb-3 border-bottom">' +
+            '<h5 class="fw-bold" style="color:var(--joy-accent);">📋 ' + (r.title || '') + '</h5>' +
+            '<p class="mb-2">' + (r.summary || '') + '</p>' +
+        '</div>' +
+        '<div class="row mb-3"><div class="col-sm-6">' +
+            '<p class="fw-bold small text-muted mb-2">🌟 月度亮点</p>' +
+            (highlightsHtml || '<p class="text-muted small">暂无亮点</p>') +
+        '</div><div class="col-sm-6">' +
+            '<p class="fw-bold small text-muted mb-2">📊 数据概览</p>' +
+            '<div class="row small"><div class="col-6">📅 运动次数</div><div class="col-6 fw-bold">' + (r.monthCount || 0) + '次</div></div>' +
+            '<div class="row small"><div class="col-6">⏱️ 运动时长</div><div class="col-6 fw-bold">' + (r.monthDuration || 0) + '分钟</div></div>' +
+            '<div class="row small"><div class="col-6">🔥 连续打卡</div><div class="col-6 fw-bold">' + (r.streakDays || 0) + '天</div></div>' +
+            '<div class="row small"><div class="col-6">🏅 勋章数</div><div class="col-6 fw-bold">' + (r.medalCount || 0) + '枚</div></div>' +
+        '</div></div>' +
+        '<div class="p-3 rounded" style="background:var(--joy-bg);">' +
+            '<p class="fw-bold mb-1">💪 ' + (r.encouragement || '') + '</p>' +
+            '<p class="small text-muted mb-0">🎯 ' + (r.nextGoal || '') + '</p>' +
+        '</div>';
+
+    $('#aiReportContent').html(html);
+}
+
+// 响应式图表
+$(window).resize(function() {
+    ['pieChart','barChart','durationChart'].forEach(function(id) {
+        echarts.getInstanceByDom(document.getElementById(id))?.resize();
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+/* =============================================
+   悦动宝 JoyMove — 品牌样式（Skill 规范配色）
+   ============================================= */
+
+:root {
+    --joy-primary: #FFB74D;      /* 温暖橙 */
+    --joy-secondary: #81C784;    /* 健康绿 */
+    --joy-bg: #FFF8E1;           /* 暖白 */
+    --joy-accent: #FF7043;       /* 活力橙红 */
+    --joy-dark: #4E342E;         /* 深棕 */
+    --joy-text: #3E2723;         /* 正文深棕 */
+    --joy-muted: #8D6E63;        /* 次要文字 */
+    --joy-card: #FFFFFF;
+    --joy-shadow: 0 2px 12px rgba(255, 183, 77, 0.15);
+}
+
+body {
+    background: var(--joy-bg);
+    color: var(--joy-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
+}
+
+/* ====== Navbar ====== */
+.navbar-joy {
+    background: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+    box-shadow: 0 2px 16px rgba(255, 152, 0, 0.2);
+}
+.navbar-joy .navbar-brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: #fff !important;
+}
+.navbar-joy .nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.navbar-joy .nav-link:hover {
+    color: #fff !important;
+}
+.navbar-joy .btn-outline-joy {
+    border-color: #fff;
+    color: #fff;
+}
+.navbar-joy .btn-outline-joy:hover {
+    background: #fff;
+    color: var(--joy-primary);
+}
+
+/* ====== Hero ====== */
+.joy-hero {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 50%, #FFCC80 100%);
+    padding: 60px 0 40px;
+    text-align: center;
+    border-bottom: 4px solid var(--joy-primary);
+}
+.joy-hero h1 {
+    font-weight: 800;
+    color: var(--joy-dark);
+    font-size: 2.4rem;
+}
+.joy-hero .lead {
+    color: var(--joy-muted);
+    font-size: 1.15rem;
+}
+
+/* ====== Cards ====== */
+.joy-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--joy-shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+.joy-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(255, 183, 77, 0.25);
+}
+.joy-card .card-img-top {
+    height: 180px;
+    object-fit: cover;
+}
+
+/* ====== Buttons ====== */
+.btn-joy {
+    background: var(--joy-primary);
+    border-color: var(--joy-primary);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 12px;
+}
+.btn-joy:hover {
+    background: #FFA726;
+    border-color: #FFA726;
+    color: #fff;
+}
+.btn-joy-outline {
+    border: 2px solid var(--joy-primary);
+    color: var(--joy-primary);
+    font-weight: 700;
+    border-radius: 12px;
+    background: transparent;
+}
+.btn-joy-outline:hover {
+    background: var(--joy-primary);
+    color: #fff;
+}
+
+/* ====== Badges & Tags ====== */
+.badge-joy {
+    background: var(--joy-primary);
+    color: #fff;
+    font-weight: 600;
+}
+.badge-emotion { font-size: 1.2rem; }
+.tag-joy {
+    display: inline-block;
+    padding: 4px 14px;
+    margin: 3px;
+    border-radius: 20px;
+    background: #FFF3E0;
+    color: var(--joy-accent);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+.tag-joy:hover {
+    background: var(--joy-accent);
+    color: #fff;
+}
+
+/* ====== Auth Pages ====== */
+.joy-auth-bg {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 50%, #FFCC80 100%);
+    min-height: 100vh;
+}
+.joy-auth-card {
+    max-width: 440px;
+    margin: 80px auto;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(255, 152, 0, 0.2);
+    border: none;
+}
+.joy-auth-card .card-body {
+    padding: 40px;
+}
+
+/* ====== Stats ====== */
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--joy-primary);
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--joy-muted);
+}
+
+/* ====== Calendar ====== */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.calendar-day.checked {
+    background: var(--joy-secondary);
+    color: #fff;
+}
+.calendar-day.today {
+    border: 2px solid var(--joy-primary);
+}
+.calendar-day.empty {
+    color: #ccc;
+}
+
+/* ====== Emoji ====== */
+.emoji-lg { font-size: 3rem; }
+.emoji-md { font-size: 2rem; }
+.emoji-sm { font-size: 1.2rem; }
+
+/* ====== Responsive ====== */
+@media (max-width: 768px) {
+    .joy-hero h1 { font-size: 1.6rem; }
+    .joy-hero { padding: 30px 0 20px; }
+}

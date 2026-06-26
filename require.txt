@@ -1,0 +1,54 @@
+📝体育博客系统需求规格说明书 (SRS)
+## 1.项目概述* 项目名称：SportsBlog (体育主题博客系统)* 项目目标：构建一个集博客发布、审核、评论互动、球队数据展示及个性化推荐于一体的垂直领域社区系统，用于本地运行及 AI编程工具效率对比实验。* 运行环境：本地开发环境 (Localhost)，无需公网部署。
+
+##2.技术栈约束 (Non-Functional Requirements)
+后端框架：Spring Boot2.7.x (Java 8)* ORM 框架：MyBatis-Plus (使用其自动填充、分页插件、条件构造器)* 数据库：MySQL 8.0* 前端技术：Thymeleaf (模板引擎) + Bootstrap 5 (UI框架) + jQuery (可选，用于简单交互)
+文件存储：本地文件系统 (src/main/resources/static/uploads)
+安全策略：Spring Security + Session 管理登录状态 (密码 BCrypt 加密，基于角色的访问控制 RBAC)* 编码规范：RESTful风格接口设计，Lombok 简化代码，统一返回结果封装。---
+
+##3. 功能列表与用户故事 (Functional Requirements)
+###3.1角色定义|角色 |描述 | 权限范围 || :--- | :--- | :--- | | **游客 **(Guest) | 未登录用户 | 浏览已发布博客、查看排名/赛程、注册/登录。不可评论、不可发帖。 || **普通用户 **(User) |注册用户 | 撰写/修改博客、发表评论、设置主队、查看个人通知。 || **管理员 **(Admin) | 系统管理者 |内容审核（通过/驳回）、管理球队数据（排名/赛程）、管理用户、删除违规内容。 |
+###3.2 核心用户故事 (User Stories)
+#### US-01:博客发布与审核流程*故事：作为普通用户，我希望提交一篇关于特定球队的博客，以便他人阅读。* 验收标准： 1.用户填写标题、选择单支球队、上传可选封面图、输入 Markdown 内容后点击提交。2. 博客状态默认为 PENDING (审核中)。 3.博客在“我的博客”列表中对自己可见，但在首页对其他人不可见。4.若管理员驳回，用户收到通知并看到驳回理由，可点击“重新编辑”修改后再次提交。5. 若管理员通过，状态变为 PUBLISHED，首页可见。
+#### US-02: 个性化主队推荐* 故事：作为普通用户，我希望设置一支“主队”，以便在首页快速查看该球队的相关资讯。* 验收标准： 1.用户可在个人中心下拉选择一支球队作为主队。 2.首页增加“我的主队”Tab页签（仅登录且设置了主队的用户可见）。 3. 切换至该 Tab时，列表仅展示 team_id 与用户 favorite_team_id匹配且状态为 PUBLISHED的博客。
+#### US-03: 楼中楼评论系统* 故事：作为用户，我希望回复某条特定的评论，形成讨论线程。* 验收标准：1.评论发布后即时显示，无需审核。2.支持无限级回复（父评论 ID 机制）。3.前端以缩进形式展示层级关系。 4.点击回复时，输入框自动聚焦并预填 @被回复人昵称。
+#### US-04:球队数据管理 (排名与赛程)* 故事：作为管理员，我希望手动录入和维护球队的联赛排名和比赛赛程。* 验收标准： 1.管理员可在后台单独页面查看/编辑每支球队的：胜场、负场、积分、当前排名。 2.管理员可添加比赛记录：对阵双方、比赛时间、比分、状态（已结束/进行中）。前台有独立的“积分榜”和“赛程表”页面展示这些数据。
+###US-05:图片上传* 故事：作为用户，我希望在写博客时上传一张封面图（可选）。* 验收标准：1.支持 JPG/PNG 格式，限制大小（如2MB）。2.图片保存至服务器本地 uploads 目录，数据库存储相对路径。3.若不上传图片，使用默认占位图发布。
+
+##4.数据库表结构设计 (Database Schema)
+
+以下是基于 MySQL 8.0的 DDL 设计，包含字段类型、约束及索引。
+```sql--1.用户表 (sys_user) CREATE TABLE sys_user ( id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键 ID', username VARCHAR(50) NOT NULL UNIQUE COMMENT '登录账号', nickname VARCHAR(50) NOT NULL COMMENT '用户昵称', password VARCHAR(100) NOT NULL COMMENT 'BCrypt 加密密码', avatar VARCHAR(255) DEFAULT '/static/images/default_avatar.png' COMMENT '头像路径', role TINYINT NOT NULL DEFAULT 0 COMMENT '角色：0-普通用户，1-管理员', favorite_team_id BIGINT DEFAULT NULL COMMENT '主队 ID (关联 team 表)', create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间', update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间', PRIMARY KEY (id), INDEX idx_favorite_team (favorite_team_id) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+--2.球队表 (sport_team)CREATE TABLE sport_team ( id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键 ID', name VARCHAR(50) NOT NULL COMMENT '球队名称 (如：湖人队)', league_type TINYINT NOT NULL COMMENT '联赛类型：1-足球，2-NBA', wins INT DEFAULT 0 COMMENT '胜场', losses INT DEFAULT 0 COMMENT '负场', points INT DEFAULT0 COMMENT '积分', rank INT DEFAULT 0 COMMENT '当前排名', logo VARCHAR(255) DEFAULT NULL COMMENT '队徽路径', create_time DATETIME DEFAULT CURRENT_TIMESTAMP, update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (id), INDEX idx_league_rank (league_type, rank) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='球队信息表';
+-- 3.博客表 (blog_post) CREATE TABLE blog_post ( id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键 ID', title VARCHAR(100) NOT NULL COMMENT '标题', content LONGTEXT NOT NULL COMMENT 'Markdown/HTML 内容', cover_image VARCHAR(255) DEFAULT NULL COMMENT '封面图路径 (可选)', author_id BIGINT NOT NULL COMMENT '作者 ID', team_id BIGINT NOT NULL COMMENT '所属球队 ID', status TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0-审核中，1-已发布，2-已驳回', reject_reason VARCHAR(255) DEFAULT NULL COMMENT '驳回理由', view_count INT DEFAULT 0 COMMENT '阅读量', create_time DATETIME DEFAULT CURRENT_TIMESTAMP, update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (id), INDEX idx_author (author_id), INDEX idx_team_status (team_id, status), INDEX idx_status_pub (status) -- 优化首页查询 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='博客文章表';
+-- 4.评论表 (blog_comment)CREATE TABLE blog_comment ( id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键 ID', post_id BIGINT NOT NULL COMMENT '关联博客 ID', user_id BIGINT NOT NULL COMMENT '评论者 ID', parent_id BIGINT DEFAULT0 COMMENT '父评论 ID (0表示根评论)', content VARCHAR(500) NOT NULL COMMENT '评论内容', create_time DATETIME DEFAULT CURRENT_TIMESTAMP, update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (id), INDEX idx_post (post_id), INDEX idx_parent (parent_id) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表';
+--5.通知表 (sys_notification) CREATE TABLE sys_notification ( id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键 ID', user_id BIGINT NOT NULL COMMENT '接收用户 ID', type TINYINT NOT NULL COMMENT '类型：1-博客驳回', message VARCHAR(255) NOT NULL COMMENT '消息内容 (含驳回理由)', related_id BIGINT DEFAULT NULL COMMENT '关联业务 ID (如博客 ID)', create_time DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), INDEX idx_user (user_id) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统通知表';
+--6.赛程表 (sport_schedule) CREATE TABLE sport_schedule ( id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键 ID', home_team_id BIGINT NOT NULL COMMENT '主队 ID', away_team_id BIGINT NOT NULL COMMENT '客队 ID', match_time DATETIME NOT NULL COMMENT '比赛时间', home_score INT DEFAULT NULL COMMENT '主队得分 (null 表示未结束)', away_score INT DEFAULT NULL COMMENT '客队得分', status TINYINT DEFAULT0 COMMENT '状态：0-待开始，1-进行中，2-已结束', league_type TINYINT NOT NULL COMMENT '联赛类型：1-足球，2-NBA', create_time DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id), INDEX idx_match_time (match_time), INDEX idx_team_home (home_team_id), INDEX idx_team_away (away_team_id) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='比赛赛程表';
+
+
+###5.1首页 (Home Page)
+* **布局**：Bootstrap 栅格系统。* **顶部导航栏**： * Logo (左侧)。 *   搜索框 (中间)。    *  链接：[积分榜] [赛程] [写博客] | [登录/注册]或 [用户头像下拉菜单 (个人中心/退出)]。
+***主体区域**：
+    *   **Tab切换组件**： *   Tab 1: **全部推荐** (默认) - 展示所有 `status=1`的博客，按发布时间倒序。 *   Tab2: **我的主队** (仅登录且有主队可见) -展示 `team_id == user.favorite_team_id` 的博客。
+ * **博客卡片列表**： *   每张卡片包含：封面图 (无则默认)、标题 (加粗)、摘要 (截断前100字)、元数据行 (作者昵称 | 球队标签 | 发布时间 | 👁️阅读量)。
+*   **侧边栏 (Sidebar)** (位于右侧)： * **热门标签云**：展示热门球队名称链接。 * **快捷入口**：[查看完整积分榜] [查看完整赛程]。
+### 5.2博客详情页 (Post Detail)*   **头部**：大标题、作者信息 (头像+昵称)、所属球队徽章、发布时间、阅读量。*   **正文区**：渲染后的 Markdown/HTML 内容，样式清爽。* **评论区**： * **输入框**：文本域 +提交按钮 (登录后显示)。 *   **评论树**：        *  根评论：显示用户头像、昵称、时间、内容。
+        *回复按钮：点击后在当前评论下方展开一个小输入框，自动填入 `@昵称`。 *   子评论：向右缩进 (padding-left: 40px)，显示层级线。
+###5.3数据展示页 (独立页面)
+* **积分榜页面**： *顶部单选框：[足球] [NBA]。 *   表格列：排名、队徽、球队名、胜、负、积分、操作 (仅管理员可见：编辑)。* **赛程页面**： *  日历视图或列表视图。
+    *列表项：时间 | 主队 vs客队 |比分 (若已结束) |状态标签。
+
+###5.4用户中心 & 写博客 (Dashboard)
+* **左侧菜单**：[我的博客] [设置主队] [个人信息]。* **我的博客列表**： *表格展示标题、状态 (红/绿/黄 Badge)、操作 (编辑/删除)。 * 若有驳回文章，高亮显示并展示“驳回理由”气泡。* **写博客表单**： *标题输入框。 *   球队下拉选择 (从 DB 加载)。 *封面图上传 (File Input，预览缩略图)。 *   Markdown编辑器 (Textarea)。 *提交按钮。* **设置主队**：下拉选择球队保存。---##6.核心 API定义草案 (API Definitions)
+
+虽然主要使用 Thymeleaf服务端渲染，但部分异步交互（如点赞、评论提交、AJAX 加载更多）建议定义为 RESTful 接口。|模块 |方法 |路径 |描述 |权限 || :--- | :--- | :--- | :--- | :--- |
+| **Auth** | POST | `/api/auth/login` |用户登录 | Public || **Auth** | POST | `/api/auth/register` |用户注册 | Public || **Post** | GET | `/api/posts` | 获取博客列表 (支持 page, size, teamId, keyword参数) | Public || **Post** | GET | `/api/posts/{id}` |获取博客详情 (同时 +1 阅读量) | Public |
+| **Post** | POST | `/api/posts` |创建/更新博客 | User || **Comment**| GET | `/api/comments?postId={id}` |获取某篇文章的评论树 | Public |
+| **Comment**| POST | `/api/comments` |提交评论 | User |
+| **Team** | GET | `/api/teams/rankings?type={type}` |获取指定联赛排名 | Public |
+| **Team** | GET | `/api/teams/schedule?type={type}` |获取指定联赛赛程 | Public |
+| **Admin** | PUT | `/api/admin/posts/{id}/audit` |审核博客 (body: status, reason) | Admin || **User** | PUT | `/api/users/profile/favorite` |更新主队 | User |---## 💡给开发者的特别提示 (Tips for AI Tools)
+1. **MyBatis-Plus配置**：请启用 `MetaObjectHandler` 实现 `create_time` 和 `update_time`的自动填充。
+2. **静态资源映射**：Spring Boot需配置 `WebMvcConfigurer`将 `/uploads/**` 映射到本地磁盘路径。
+3. **递归查询**：评论表的“楼中楼”功能，建议在 Service 层递归组装 List，或使用 Java Stream 进行内存组装，避免复杂的 SQL递归（MySQL 8 虽支持 CTE但 MyBatis-Plus处理较繁琐）。
+4. **安全性**：所有涉及修改数据的接口必须校验当前登录用户的角色权限（使用 Spring Security `@PreAuthorize` 或拦截器）。---

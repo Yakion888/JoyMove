@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sportsblog.mapper.CheckInMapper">
+
+    <resultMap id="BaseResultMap" type="com.sportsblog.entity.CheckIn">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="child_id" property="childId"/>
+        <result column="check_in_date" property="checkInDate"/>
+        <result column="moment_id" property="momentId"/>
+        <result column="streak_days" property="streakDays"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="findByUserChildAndDate" resultMap="BaseResultMap">
+        SELECT * FROM check_in
+        WHERE user_id = #{userId} AND child_id = #{childId}
+        AND check_in_date = #{checkInDate} LIMIT 1
+    </select>
+
+    <select id="getCurrentStreak" resultType="int">
+        SELECT IFNULL(MAX(streak_days), 0) FROM check_in
+        WHERE user_id = #{userId} AND child_id = #{childId}
+        AND check_in_date = (
+            SELECT MAX(check_in_date) FROM check_in
+            WHERE user_id = #{userId} AND child_id = #{childId}
+        )
+    </select>
+
+    <select id="selectMonthly" resultMap="BaseResultMap">
+        SELECT * FROM check_in
+        WHERE user_id = #{userId} AND child_id = #{childId}
+        AND YEAR(check_in_date) = #{year} AND MONTH(check_in_date) = #{month}
+        ORDER BY check_in_date ASC
+    </select>
+
+</mapper>

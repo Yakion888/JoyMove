@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${project.name} + ' - 运动指导 - 悦动宝'">运动指导 - 悦动宝 JoyMove</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4" th:if="${project != null}">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- 返回 -->
+            <a href="/projects" class="btn btn-sm btn-joy-outline mb-3">← 返回项目库</a>
+
+            <div class="card joy-card mb-3">
+                <div class="card-body p-4">
+                    <!-- 头部 -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h4 class="fw-bold mb-1" th:text="${project.name}">项目名</h4>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <span class="badge" th:classappend="${project.activityType == 1} ? 'bg-success' : (${project.activityType == 2} ? 'bg-info' : 'bg-secondary')"
+                                      th:text="${project.activityType == 1} ? '🌳 户外' : (${project.activityType == 2} ? '🏠 室内' : '🌳🏠 皆可')">类型</span>
+                                <span class="badge bg-light text-dark">
+                                    ⭐<span th:text="${project.difficultyLevel}">1</span>/5 难度
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    👶 <span th:text="${project.ageRangeMin}">3</span>-<span th:text="${project.ageRangeMax}">18</span>岁
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    ⏱️ <span th:text="${project.durationMin}">10</span>-<span th:text="${project.durationMax}">60</span>分钟
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 季节提示 -->
+                    <div class="alert alert-light border mb-3 py-2" th:if="${project.seasonRecommend != null}">
+                        🌤️ 推荐季节：
+                        <span th:if="${project.seasonRecommend == 1}">🌸 春季</span>
+                        <span th:if="${project.seasonRecommend == 2}">☀️ 夏季</span>
+                        <span th:if="${project.seasonRecommend == 3}">🍂 秋季</span>
+                        <span th:if="${project.seasonRecommend == 4}">❄️ 冬季</span>
+                        <span th:if="${project.seasonRecommend == 5}">🌸☀️🍂❄️ 全年适用</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 装备 -->
+            <div class="card joy-card mb-3" th:if="${project.equipment != null and !project.equipment.isEmpty()}">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-2">🎒 所需装备</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark p-2" th:each="item : ${project.equipment.split(',')}" th:text="${item.trim()}">装备</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 描述 -->
+            <div class="card joy-card mb-3" th:if="${project.description != null and !project.description.isEmpty()}">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-2">💡 详细说明</h6>
+                    <p class="text-muted mb-0" th:text="${project.description}">描述</p>
+                </div>
+            </div>
+
+            <!-- 能力标签 -->
+            <div class="card joy-card mb-4" th:if="${project.abilityTags != null and !project.abilityTags.isEmpty()}">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-2">🎯 能力培养</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark p-2" th:each="tag : ${project.abilityTags.split(',')}" th:text="'✨ ' + ${tag.trim()}">能力</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 开始按钮 -->
+            <div class="text-center mb-5">
+                <a th:href="@{/checkin(projectId=${project.id})}" class="btn btn-joy btn-lg px-5">
+                    🏁 完成运动，去打卡
+                </a>
+                <p class="text-muted small mt-2">运动完成后点击这里记录运动数据</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 项目不存在 -->
+<div class="container text-center py-5" th:unless="${project != null}">
+    <div class="emoji-lg">📭</div>
+    <h5>项目不存在</h5>
+    <a href="/projects" class="btn btn-joy mt-3">浏览运动项目库</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

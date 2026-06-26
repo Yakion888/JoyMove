@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打卡 - 悦动宝 JoyMove</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4">
+    <h4 class="fw-bold mb-3">✅ 今日运动打卡</h4>
+
+    <div class="row">
+        <!-- 左侧：打卡表单 -->
+        <div class="col-lg-5">
+            <div class="card joy-card">
+                <div class="card-body p-4">
+                    <form id="checkinForm">
+                        <!-- 运动项目 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">🏃 运动项目</label>
+                            <select class="form-select" id="projectId" required>
+                                <option value="">-- 选择运动项目 --</option>
+                                <option th:each="p : ${projects}" th:value="${p.id}"
+                                        th:text="${p.name}">项目</option>
+                            </select>
+                        </div>
+
+                        <!-- 孩子 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">👶 参与孩子</label>
+                            <select class="form-select" id="childId" required>
+                                <option value="">-- 选择孩子 --</option>
+                                <option th:each="c : ${children}" th:value="${c.id}"
+                                        th:text="${c.name}">孩子</option>
+                            </select>
+                        </div>
+
+                        <!-- 运动日期 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">📅 运动日期</label>
+                            <input type="date" class="form-control" id="recordDate"
+                                   th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                        </div>
+
+                        <!-- 时长 + 地点 -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold">⏱️ 时长(分钟)</label>
+                                <input type="number" class="form-control" id="duration"
+                                       placeholder="30" min="1" max="480">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold">📍 地点</label>
+                                <input type="text" class="form-control" id="location"
+                                       placeholder="小区花园">
+                            </div>
+                        </div>
+
+                        <!-- 心情 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">😊 运动心情</label>
+                            <div class="btn-group w-100" role="group" id="emotionGroup">
+                                <input type="radio" class="btn-check" name="emotion" value="1" id="e1">
+                                <label class="btn btn-outline-secondary" for="e1">😄 很开心</label>
+                                <input type="radio" class="btn-check" name="emotion" value="2" id="e2">
+                                <label class="btn btn-outline-secondary" for="e2">😊 开心</label>
+                                <input type="radio" class="btn-check" name="emotion" value="3" id="e3">
+                                <label class="btn btn-outline-secondary" for="e3">😐 一般</label>
+                                <input type="radio" class="btn-check" name="emotion" value="4" id="e4">
+                                <label class="btn btn-outline-secondary" for="e4">😓 有点累</label>
+                            </div>
+                        </div>
+
+                        <!-- 孩子自评 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">⭐ 孩子自评</label>
+                            <div class="btn-group w-100" role="group" id="starsGroup">
+                                <input type="radio" class="btn-check" name="stars" value="1" id="s1">
+                                <label class="btn btn-outline-warning" for="s1">⭐</label>
+                                <input type="radio" class="btn-check" name="stars" value="2" id="s2">
+                                <label class="btn btn-outline-warning" for="s2">⭐⭐</label>
+                                <input type="radio" class="btn-check" name="stars" value="3" id="s3">
+                                <label class="btn btn-outline-warning" for="s3">⭐⭐⭐</label>
+                                <input type="radio" class="btn-check" name="stars" value="4" id="s4">
+                                <label class="btn btn-outline-warning" for="s4">⭐⭐⭐⭐</label>
+                                <input type="radio" class="btn-check" name="stars" value="5" id="s5">
+                                <label class="btn btn-outline-warning" for="s5">⭐⭐⭐⭐⭐</label>
+                            </div>
+                        </div>
+
+                        <!-- 话题标签 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">🏷️ 话题标签</label>
+                            <div class="d-flex flex-wrap gap-1" id="tagCheckboxes">
+                                <span class="badge bg-light text-dark tag-select" data-tag="亲子跑" style="cursor:pointer;">#亲子跑</span>
+                                <span class="badge bg-light text-dark tag-select" data-tag="家庭障碍赛" style="cursor:pointer;">#家庭障碍赛</span>
+                                <span class="badge bg-light text-dark tag-select" data-tag="周末徒步" style="cursor:pointer;">#周末徒步</span>
+                                <span class="badge bg-light text-dark tag-select" data-tag="雨中运动" style="cursor:pointer;">#雨中运动</span>
+                                <span class="badge bg-light text-dark tag-select" data-tag="公园时光" style="cursor:pointer;">#公园时光</span>
+                                <span class="badge bg-light text-dark tag-select" data-tag="亲子瑜伽" style="cursor:pointer;">#亲子瑜伽</span>
+                                <span class="badge bg-light text-dark tag-select" data-tag="跳绳挑战" style="cursor:pointer;">#跳绳挑战</span>
+                            </div>
+                            <input type="hidden" id="tagsInput" name="tags">
+                        </div>
+
+                        <!-- 文字记录 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">📝 运动感受</label>
+                            <textarea class="form-control" id="content" rows="3"
+                                      placeholder="今天和孩子做了什么运动？有什么有趣的瞬间..."></textarea>
+                        </div>
+
+                        <!-- 照片 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">📸 晒照片</label>
+                            <input type="file" class="form-control" id="image" accept="image/*">
+                        </div>
+
+                        <!-- 是否公开 -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="isPublic" checked value="1">
+                            <label class="form-check-label">公开分享到社区</label>
+                        </div>
+
+                        <div class="alert alert-success d-none" id="successBox"></div>
+                        <div class="alert alert-danger d-none" id="errorBox"></div>
+
+                        <button type="submit" class="btn btn-joy btn-lg w-100" id="submitBtn">
+                            ✅ 完成打卡
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：月度日历 -->
+        <div class="col-lg-7">
+            <div class="card joy-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <button class="btn btn-sm btn-joy-outline" id="prevMonth">◀</button>
+                        <h5 class="fw-bold mb-0" id="calendarTitle">2026年6月</h5>
+                        <button class="btn btn-sm btn-joy-outline" id="nextMonth">▶</button>
+                    </div>
+
+                    <div class="calendar-grid mb-2" style="font-size:0.8rem; color:var(--joy-muted);">
+                        <div class="text-center">日</div><div class="text-center">一</div>
+                        <div class="text-center">二</div><div class="text-center">三</div>
+                        <div class="text-center">四</div><div class="text-center">五</div>
+                        <div class="text-center">六</div>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+
+                    <!-- 统计 -->
+                    <div class="row text-center mt-4 pt-3 border-top">
+                        <div class="col">
+                            <div class="stat-number" id="totalDays">0</div>
+                            <div class="stat-label">本月运动天数</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-number" id="streakDays">0</div>
+                            <div class="stat-label">🔥 连续天数</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-number" id="totalActivities">0</div>
+                            <div class="stat-label">累计运动次数</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+<script th:inline="javascript">
+var currentYear = new Date().getFullYear();
+var currentMonth = new Date().getMonth() + 1;
+
+// ====== 日历 ======
+function loadCalendar(year, month) {
+    $.get('/api/moment/calendar', { year: year, month: month }, function(res) {
+        if (res.code !== 200) return;
+        var data = res.data;
+        $('#calendarTitle').text(year + '年' + month + '月');
+        $('#totalDays').text(data.totalDays);
+        $('#streakDays').text(data.streakDays);
+        $('#totalActivities').text(data.totalActivities);
+
+        var firstDay = new Date(year, month - 1, 1).getDay();
+        var daysInMonth = new Date(year, month, 0).getDate();
+        var grid = $('#calendarGrid').empty();
+
+        // 填充空白
+        for (var i = 0; i < firstDay; i++) {
+            grid.append('<div class="calendar-day empty"></div>');
+        }
+
+        // 填充日期
+        for (var d = 1; d <= daysInMonth; d++) {
+            var dateStr = year + '-' + String(month).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+            var dayData = data.days[d - 1];
+            var day = $('<div class="calendar-day"></div>').text(d);
+
+            if (dayData && dayData.hasRecord) {
+                day.addClass('checked');
+                var emoji = dayData.emotionEmoji || '';
+                day.attr('title', (dayData.projectName || '运动') + ' ' + emoji);
+                day.css('cursor', 'pointer');
+                day.text(emoji || d);
+            }
+
+            var today = new Date();
+            if (d === today.getDate() && month === today.getMonth() + 1 && year === today.getFullYear()) {
+                day.addClass('today');
+            }
+
+            grid.append(day);
+        }
+    });
+}
+
+$('#prevMonth').click(function() {
+    currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+    loadCalendar(currentYear, currentMonth);
+});
+$('#nextMonth').click(function() {
+    currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+    loadCalendar(currentYear, currentMonth);
+});
+
+// ====== 标签选择 ======
+$('.tag-select').click(function() {
+    $(this).toggleClass('badge-joy bg-light text-dark');
+    var tags = [];
+    $('.tag-select.badge-joy').each(function() { tags.push($(this).data('tag')); });
+    $('#tagsInput').val(tags.join(','));
+});
+function updateTagsInput() {
+    var tags = [];
+    $('.tag-select.badge-joy').each(function() { tags.push($(this).data('tag')); });
+    $('#tagsInput').val(tags.join(','));
+}
+
+// ====== 打卡表单 ======
+$('#checkinForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = new FormData();
+    formData.append('projectId', $('#projectId').val());
+    formData.append('childId', $('#childId').val());
+    formData.append('recordDate', $('#recordDate').val());
+    formData.append('duration', $('#duration').val());
+    formData.append('location', $('#location').val());
+    formData.append('content', $('#content').val());
+    formData.append('emotion', $('input[name=emotion]:checked').val());
+    formData.append('stars', $('input[name=stars]:checked').val());
+    formData.append('isPublic', $('#isPublic').is(':checked') ? 1 : 0);
+    formData.append('tags', updateTagsInput() || $('#tagsInput').val());
+
+    var file = $('#image')[0].files[0];
+    if (file) formData.append('image', file);
+
+    $('#submitBtn').prop('disabled', true).text('打卡中...');
+    $('#successBox').addClass('d-none');
+    $('#errorBox').addClass('d-none');
+
+    $.ajax({
+        url: '/api/moment/create',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(res) {
+            if (res.code === 200) {
+                $('#successBox').removeClass('d-none').text(res.data || '打卡成功！🎉');
+                $('#checkinForm')[0].reset();
+                loadCalendar(currentYear, currentMonth);
+            } else {
+                $('#errorBox').removeClass('d-none').text(res.msg || '打卡失败');
+            }
+        },
+        error: function() {
+            $('#errorBox').removeClass('d-none').text('网络错误');
+        },
+        complete: function() {
+            $('#submitBtn').prop('disabled', false).text('✅ 完成打卡');
+        }
+    });
+});
+
+// 初始加载
+loadCalendar(currentYear, currentMonth);
+</script>
+</body>
+</html>

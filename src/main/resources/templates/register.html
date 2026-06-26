@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 悦动宝 JoyMove</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+    <style>
+        .auth-brand { font-size: 3rem; }
+    </style>
+</head>
+<body class="joy-auth-bg">
+
+<div class="container">
+    <div class="card joy-auth-card">
+        <div class="card-body text-center">
+            <div class="auth-brand mb-2">🚀</div>
+            <h3 class="fw-bold mb-1">加入悦动宝</h3>
+            <p class="text-muted mb-4">开启亲子运动新旅程</p>
+
+            <form id="registerForm" novalidate class="text-start">
+                <div class="mb-3">
+                    <label for="username" class="form-label fw-bold">用户名</label>
+                    <input type="text" class="form-control form-control-lg" id="username" name="username"
+                           placeholder="3-50位登录账号" required minlength="3" maxlength="50">
+                    <div class="invalid-feedback" id="usernameFeedback">请输入 3-50 位用户名</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nickname" class="form-label fw-bold">昵称</label>
+                    <input type="text" class="form-control form-control-lg" id="nickname" name="nickname"
+                           placeholder="你的显示昵称" required maxlength="50">
+                    <div class="invalid-feedback" id="nicknameFeedback">请输入昵称</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-bold">密码</label>
+                    <input type="password" class="form-control form-control-lg" id="password" name="password"
+                           placeholder="至少6位密码" required minlength="6">
+                    <div class="invalid-feedback" id="passwordFeedback">密码至少6位</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label fw-bold">确认密码</label>
+                    <input type="password" class="form-control form-control-lg" id="confirmPassword"
+                           placeholder="再次输入密码" required minlength="6">
+                    <div class="invalid-feedback" id="confirmFeedback">两次密码不一致</div>
+                </div>
+
+                <hr class="my-4">
+                <p class="text-muted small mb-3">👶 孩子信息（选填，稍后可在个人中心补充）</p>
+
+                <div class="mb-3">
+                    <label for="childName" class="form-label fw-bold">孩子昵称</label>
+                    <input type="text" class="form-control" id="childName" name="childName"
+                           placeholder="如：乐乐、妞妞" maxlength="50">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-bold">性别</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="childGender" value="0" id="cg0">
+                            <label class="btn btn-outline-primary" for="cg0">👦 男孩</label>
+                            <input type="radio" class="btn-check" name="childGender" value="1" id="cg1">
+                            <label class="btn btn-outline-primary" for="cg1">👧 女孩</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label for="childBirth" class="form-label fw-bold">出生日期</label>
+                        <input type="date" class="form-control" id="childBirth" name="childBirth">
+                    </div>
+                </div>
+
+                <!-- 家庭角色 -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">我是</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="familyRole" value="0" id="fr0" checked>
+                        <label class="btn btn-outline-primary" for="fr0">👨 爸爸</label>
+                        <input type="radio" class="btn-check" name="familyRole" value="1" id="fr1">
+                        <label class="btn btn-outline-primary" for="fr1">👩 妈妈</label>
+                        <input type="radio" class="btn-check" name="familyRole" value="2" id="fr2">
+                        <label class="btn btn-outline-primary" for="fr2">👪 其他家人</label>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger d-none" id="alertBox" role="alert"></div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-joy btn-lg" id="submitBtn">
+                        <span class="spinner-border spinner-border-sm d-none" id="spinner"></span>
+                        注 册
+                    </button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <span class="text-muted">已有账户？</span>
+                    <a href="/login" class="fw-bold" style="color:var(--joy-accent);">立即登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script th:inline="javascript">
+$(function() {
+    var $form = $('#registerForm'), $username = $('#username'), $nickname = $('#nickname'),
+        $password = $('#password'), $confirm = $('#confirmPassword'),
+        $alertBox = $('#alertBox'), $submitBtn = $('#submitBtn'), $spinner = $('#spinner');
+
+    function showError(input, valid) {
+        input.toggleClass('is-invalid', !valid).toggleClass('is-valid', valid);
+    }
+
+    $username.on('input', function() {
+        var v = $(this).val().trim();
+        showError($(this), v.length >= 3 && v.length <= 50);
+    });
+    $nickname.on('input', function() {
+        showError($(this), $(this).val().trim().length >= 1);
+    });
+    $password.on('input', function() {
+        showError($(this), $(this).val().length >= 6);
+    });
+    $confirm.on('input', function() {
+        showError($(this), $(this).val() === $password.val() && $(this).val().length >= 6);
+    });
+
+    $form.on('submit', function(e) {
+        e.preventDefault();
+        var username = $username.val().trim(), nickname = $nickname.val().trim(),
+            password = $password.val(), confirm = $confirm.val();
+
+        var valid = true;
+        if (username.length < 3 || username.length > 50) { showError($username, false); valid = false; }
+        if (nickname.length < 1) { showError($nickname, false); valid = false; }
+        if (password.length < 6) { showError($password, false); valid = false; }
+        if (password !== confirm) { showError($confirm, false); valid = false; }
+        if (!valid) return;
+
+        $submitBtn.prop('disabled', true); $spinner.removeClass('d-none'); $alertBox.addClass('d-none');
+
+        var childName = $('#childName').val().trim();
+        var childGender = $('input[name=childGender]:checked').val();
+        var childBirth = $('#childBirth').val();
+        var familyRole = $('input[name=familyRole]:checked').val();
+
+        $.ajax({
+            url: '/api/auth/register', type: 'POST',
+            data: {
+                username: username, password: password, nickname: nickname,
+                childName: childName, childGender: childGender,
+                childBirth: childBirth, familyRole: familyRole
+            },
+            success: function(res) {
+                if (res.code === 200) {
+                    window.location.href = '/login?registered';
+                } else {
+                    $alertBox.removeClass('d-none').text(res.msg || '注册失败');
+                }
+            },
+            error: function() {
+                $alertBox.removeClass('d-none').text('网络错误，请稍后重试');
+            },
+            complete: function() {
+                $submitBtn.prop('disabled', false); $spinner.addClass('d-none');
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>
