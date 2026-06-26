@@ -1,17 +1,26 @@
 /* =============================================
-   悦动宝 JoyMove — 品牌样式（Skill 规范配色）
+   悦动宝 JoyMove — 品牌样式 v2.0
    ============================================= */
 
 :root {
-    --joy-primary: #FFB74D;      /* 温暖橙 */
-    --joy-secondary: #81C784;    /* 健康绿 */
-    --joy-bg: #FFF8E1;           /* 暖白 */
-    --joy-accent: #FF7043;       /* 活力橙红 */
-    --joy-dark: #4E342E;         /* 深棕 */
-    --joy-text: #3E2723;         /* 正文深棕 */
-    --joy-muted: #8D6E63;        /* 次要文字 */
+    --joy-primary: #FFB74D;
+    --joy-secondary: #81C784;
+    --joy-bg: #FFF8E1;
+    --joy-accent: #FF7043;
+    --joy-dark: #4E342E;
+    --joy-text: #3E2723;
+    --joy-muted: #8D6E63;
     --joy-card: #FFFFFF;
-    --joy-shadow: 0 2px 12px rgba(255, 183, 77, 0.15);
+
+    /* 统一设计 Token */
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-full: 999px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.10);
+    --shadow-auth: 0 12px 40px rgba(255,152,0,0.15);
+    --transition: 0.3s ease;
 }
 
 body {
@@ -20,114 +29,184 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
 }
 
-/* ====== Navbar ====== */
+/* ====== Navbar (毛玻璃) ====== */
 .navbar-joy {
-    background: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
-    box-shadow: 0 2px 16px rgba(255, 152, 0, 0.2);
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
 }
 .navbar-joy .navbar-brand {
-    font-weight: 800;
-    font-size: 1.5rem;
-    color: #fff !important;
+    font-weight: 800; font-size: 1.5rem;
+    background: linear-gradient(135deg, #FF9800, #FF7043);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.navbar-joy .navbar-brand small {
+    -webkit-text-fill-color: #8D6E63;
 }
 .navbar-joy .nav-link {
-    color: rgba(255,255,255,0.9) !important;
-    font-weight: 600;
-    transition: color 0.2s;
+    color: var(--joy-text) !important; font-weight: 600; transition: color var(--transition);
 }
-.navbar-joy .nav-link:hover {
-    color: #fff !important;
+.navbar-joy .nav-link:hover { color: var(--joy-accent) !important; }
+.navbar-joy .navbar-toggler { border-color: rgba(0,0,0,0.15); }
+.navbar-joy .navbar-toggler-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(0,0,0,0.5)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); }
+.navbar-joy.scrolled .navbar-toggler { border-color: rgba(255,255,255,0.5); }
+.navbar-joy.scrolled .navbar-toggler-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(255,255,255,0.8)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); }
+
+/* 滚动后恢复实色（JS 可选） */
+.navbar-joy.scrolled {
+    background: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+    box-shadow: 0 2px 16px rgba(255,152,0,0.2);
 }
-.navbar-joy .btn-outline-joy {
-    border-color: #fff;
-    color: #fff;
+.navbar-joy.scrolled .navbar-brand {
+    -webkit-text-fill-color: #fff; background: none;
 }
-.navbar-joy .btn-outline-joy:hover {
-    background: #fff;
-    color: var(--joy-primary);
-}
+.navbar-joy.scrolled .navbar-brand small { color: rgba(255,255,255,0.6) !important; }
+.navbar-joy.scrolled .nav-link { color: rgba(255,255,255,0.9) !important; }
+.navbar-joy.scrolled .nav-link:hover { color: #fff !important; }
 
 /* ====== Hero ====== */
 .joy-hero {
-    background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 50%, #FFCC80 100%);
-    padding: 60px 0 40px;
-    text-align: center;
+    position: relative;
+    background: url('/images/hero-bg.jpg') center/cover no-repeat;
+    margin-top: -48px;
+    padding: 118px 0 50px; text-align: center;
     border-bottom: 4px solid var(--joy-primary);
 }
+.joy-hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 1;
+}
+.joy-hero > * { position: relative; z-index: 2; }
 .joy-hero h1 {
-    font-weight: 800;
-    color: var(--joy-dark);
-    font-size: 2.4rem;
+    font-weight: 800; color: #fff; font-size: 2.4rem;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
-.joy-hero .lead {
-    color: var(--joy-muted);
-    font-size: 1.15rem;
-}
+.joy-hero .lead { color: rgba(255,255,255,0.9); font-size: 1.15rem; }
+.joy-hero .text-muted { color: rgba(255,255,255,0.7) !important; }
 
 /* ====== Cards ====== */
 .joy-card {
-    border: none;
-    border-radius: 16px;
-    box-shadow: var(--joy-shadow);
-    transition: transform 0.2s, box-shadow 0.2s;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.35s ease;
     overflow: hidden;
 }
 .joy-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(255, 183, 77, 0.25);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.10);
+}
+.joy-card:active {
+    transform: translateY(-1px) scale(0.995);
 }
 .joy-card .card-img-top {
-    height: 180px;
-    object-fit: cover;
+    height: 180px; object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.joy-card:hover .card-img-top {
+    transform: scale(1.03);
+}
+.joy-card .card-body { padding: 1.25rem; }
+
+/* 统计小卡 hover */
+.joy-card .stat-number {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.joy-card:hover .stat-number {
+    transform: scale(1.08);
 }
 
 /* ====== Buttons ====== */
 .btn-joy {
-    background: var(--joy-primary);
-    border-color: var(--joy-primary);
-    color: #fff;
-    font-weight: 700;
-    border-radius: 12px;
+    background: var(--joy-primary); border: none;
+    color: #fff; font-weight: 700;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
 }
 .btn-joy:hover {
-    background: #FFA726;
-    border-color: #FFA726;
-    color: #fff;
+    background: #FFA726; color: #fff; transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255,152,0,0.3);
 }
+.btn-joy:active { transform: translateY(0); }
 .btn-joy-outline {
     border: 2px solid var(--joy-primary);
-    color: var(--joy-primary);
-    font-weight: 700;
-    border-radius: 12px;
-    background: transparent;
+    color: var(--joy-primary); font-weight: 700;
+    border-radius: var(--radius-sm); background: transparent;
+    transition: all var(--transition);
 }
 .btn-joy-outline:hover {
-    background: var(--joy-primary);
-    color: #fff;
+    background: var(--joy-primary); color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255,152,0,0.2);
+}
+.btn-joy-outline:active { transform: translateY(0); }
+
+/* 导航栏打卡按钮微动效 */
+.navbar-joy .nav-link {
+    transition: transform 0.2s ease, color var(--transition);
+}
+.navbar-joy .nav-link:hover {
+    transform: translateY(-1px);
 }
 
-/* ====== Badges & Tags ====== */
-.badge-joy {
-    background: var(--joy-primary);
-    color: #fff;
-    font-weight: 600;
+/* 标签微动效 */
+.tag-joy:hover {
+    transform: translateY(-1px);
 }
+.tag-select {
+    transition: all 0.25s ease; cursor: pointer;
+}
+.tag-select:hover {
+    transform: translateY(-1px);
+}
+
+.btn { border-radius: var(--radius-sm); transition: all var(--transition); }
+
+/* ====== Form Controls ====== */
+.form-control, .form-select {
+    border-radius: var(--radius-sm);
+    border-color: #E0E0E0;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--joy-primary);
+    box-shadow: 0 0 0 0.2rem rgba(255,183,77,0.25);
+}
+.form-control-lg { border-radius: var(--radius-md); }
+
+/* ====== Badges & Tags ====== */
+.badge {
+    border-radius: var(--radius-full);
+    padding: 5px 12px;
+}
+.badge-joy { background: var(--joy-primary); color: #fff; font-weight: 600; }
 .badge-emotion { font-size: 1.2rem; }
 .tag-joy {
-    display: inline-block;
-    padding: 4px 14px;
-    margin: 3px;
-    border-radius: 20px;
-    background: #FFF3E0;
-    color: var(--joy-accent);
-    text-decoration: none;
-    font-size: 0.85rem;
-    transition: all 0.2s;
+    display: inline-block; padding: 4px 14px; margin: 3px;
+    border-radius: var(--radius-full); background: #FFF3E0;
+    color: var(--joy-accent); text-decoration: none;
+    font-size: 0.85rem; transition: all var(--transition);
 }
-.tag-joy:hover {
-    background: var(--joy-accent);
-    color: #fff;
+.tag-joy:hover { background: var(--joy-accent); color: #fff; }
+.tag-joy.active-tag { background: var(--joy-primary); color: #fff; }
+
+/* ====== Input Group ====== */
+.input-group .form-control {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
+.input-group .btn {
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* ====== Modal ====== */
+.modal-content { border-radius: var(--radius-lg); border: none; }
+.modal-header { border-bottom: 1px solid #F0F0F0; }
+.modal-footer { border-top: 1px solid #F0F0F0; }
 
 /* ====== Auth Pages ====== */
 .joy-auth-bg {
@@ -135,60 +214,92 @@ body {
     min-height: 100vh;
 }
 .joy-auth-card {
-    max-width: 440px;
-    margin: 80px auto;
-    border-radius: 20px;
-    box-shadow: 0 12px 40px rgba(255, 152, 0, 0.2);
-    border: none;
+    max-width: 440px; margin: 80px auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-auth); border: none;
 }
-.joy-auth-card .card-body {
-    padding: 40px;
-}
+.joy-auth-card .card-body { padding: 40px; }
 
 /* ====== Stats ====== */
-.stat-number {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--joy-primary);
-}
-.stat-label {
-    font-size: 0.85rem;
-    color: var(--joy-muted);
-}
+.stat-number { font-size: 2rem; font-weight: 800; color: var(--joy-primary); }
+.stat-label { font-size: 0.85rem; color: var(--joy-muted); }
 
 /* ====== Calendar ====== */
 .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
 }
 .calendar-day {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.9rem;
+    aspect-ratio: 1; display: flex;
+    align-items: center; justify-content: center;
+    border-radius: var(--radius-sm); font-weight: 600; font-size: 0.9rem;
 }
 .calendar-day.checked {
-    background: var(--joy-secondary);
-    color: #fff;
+    background: var(--joy-secondary); color: #fff;
+    animation: popIn 0.3s ease;
 }
-.calendar-day.today {
-    border: 2px solid var(--joy-primary);
+.calendar-day.today { border: 2px solid var(--joy-primary); }
+.calendar-day.empty { color: #ccc; }
+
+@keyframes popIn {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
-.calendar-day.empty {
-    color: #ccc;
+
+/* ====== Tables ====== */
+.table th, .table td { vertical-align: middle; }
+.table thead th {
+    border-bottom: 2px solid var(--joy-primary);
+    font-weight: 700; font-size: 0.85rem; color: var(--joy-muted);
 }
+
+/* ====== Pagination ====== */
+.pagination { gap: 4px; }
+.page-link {
+    border-radius: var(--radius-sm); border: none;
+    color: var(--joy-text); padding: 6px 14px;
+    transition: all var(--transition);
+}
+.page-link:hover { background: #FFF3E0; color: var(--joy-primary); }
+.page-item.active .page-link {
+    background: var(--joy-primary); border-color: var(--joy-primary);
+    color: #fff; border-radius: var(--radius-sm);
+}
+.page-item:first-child .page-link,
+.page-item:last-child .page-link { border-radius: var(--radius-sm); }
+
+/* ====== Nav Tabs ====== */
+.nav-tabs .nav-link {
+    border: none; border-radius: var(--radius-sm); color: var(--joy-muted);
+    font-weight: 600; transition: all var(--transition);
+}
+.nav-tabs .nav-link.active {
+    color: var(--joy-primary); background: #FFF3E0;
+}
+
+/* ====== Progress ====== */
+.progress { border-radius: var(--radius-full); background: #F5F5F5; height: 6px; }
+.progress-bar { border-radius: var(--radius-full); }
+
+/* ====== Dropdown ====== */
+.dropdown-menu { border-radius: var(--radius-md); border: none; box-shadow: var(--shadow-hover); }
+.dropdown-item { border-radius: var(--radius-sm); margin: 2px 6px; width: auto; }
+
+/* ====== Alert ====== */
+.alert { border-radius: var(--radius-md); border: none; }
 
 /* ====== Emoji ====== */
 .emoji-lg { font-size: 3rem; }
 .emoji-md { font-size: 2rem; }
 .emoji-sm { font-size: 1.2rem; }
 
+/* ====== Empty State ====== */
+.empty-state { padding: 60px 0; text-align: center; color: var(--joy-muted); }
+.empty-state .emoji-lg { opacity: 0.4; }
+
 /* ====== Responsive ====== */
 @media (max-width: 768px) {
     .joy-hero h1 { font-size: 1.6rem; }
-    .joy-hero { padding: 30px 0 20px; }
+    .joy-hero { margin-top: -44px; padding: 104px 0 30px; }
+    .joy-auth-card { margin: 40px 16px; }
 }

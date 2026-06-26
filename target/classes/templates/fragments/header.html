@@ -1,10 +1,10 @@
 <!-- ==================== 悦动宝 导航栏 ==================== -->
-<nav class="navbar navbar-expand-lg navbar-joy sticky-top" th:fragment="navbar">
+<nav class="navbar navbar-expand-lg navbar-joy sticky-top" th:fragment="navbar" style="min-height:48px;padding:2px 0;">
     <div class="container">
-        <!-- 品牌 -->
-        <a class="navbar-brand" href="/" style="line-height:1.1;">
-            <div style="font-size:2.2rem;font-weight:900;">🏃 悦动宝</div>
-            <small style="font-size:0.65rem;color:rgba(255,255,255,0.6);font-weight:400;">JoyMove · 亲子运动陪伴平台</small>
+        <!-- 品牌：LOGO 满高 + 副标题右侧 -->
+        <a class="navbar-brand d-flex align-items-center" href="/" style="padding:0;gap:10px;">
+            <span style="font-size:1.8rem;font-weight:900;line-height:1;">🏃 悦动宝</span>
+            <small style="font-size:1rem;font-weight:400;color:var(--joy-muted);">JoyMove · 亲子运动陪伴平台</small>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
@@ -12,57 +12,52 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMain">
-            <!-- 中间：主导航，占 1/2 宽度 -->
-            <ul class="navbar-nav mx-auto" style="gap:8px;">
-                <li class="nav-item"><a class="nav-link" href="/" style="font-size:1.2rem;padding:8px 16px;font-weight:600;">🏠 首页</a></li>
-                <li class="nav-item"><a class="nav-link" href="/projects" style="font-size:1.2rem;padding:8px 16px;font-weight:600;">📋 项目</a></li>
-                <li class="nav-item"><a class="nav-link" href="/plans" style="font-size:1.2rem;padding:8px 16px;font-weight:600;">📅 计划</a></li>
-                <li class="nav-item"><a class="nav-link" href="/medals" style="font-size:1.2rem;padding:8px 16px;font-weight:600;">🏅 勋章</a></li>
-                <li class="nav-item"><a class="nav-link" href="/community" style="font-size:1.2rem;padding:8px 16px;font-weight:600;">💬 社区</a></li>
-                <li class="nav-item"><a class="nav-link" href="/dashboard" style="font-size:1.2rem;padding:8px 16px;font-weight:600;">📊 看板</a></li>
+            <ul class="navbar-nav mx-auto align-items-lg-center" style="gap:4px;">
+                <li class="nav-item"><a class="nav-link" href="/" style="font-size:1rem;padding:4px 12px;font-weight:600;">🏠 首页</a></li>
+                <li class="nav-item"><a class="nav-link" href="/projects" style="font-size:1rem;padding:4px 12px;font-weight:600;">📋 项目</a></li>
+                <li class="nav-item"><a class="nav-link" href="/plans" style="font-size:1rem;padding:4px 12px;font-weight:600;">📅 计划</a></li>
+                <li class="nav-item"><a class="nav-link" href="/medals" style="font-size:1rem;padding:4px 12px;font-weight:600;">🏅 勋章</a></li>
+                <li class="nav-item"><a class="nav-link" href="/community" style="font-size:1rem;padding:4px 12px;font-weight:600;">💬 社区</a></li>
+                <li class="nav-item"><a class="nav-link" href="/dashboard" style="font-size:1rem;padding:4px 12px;font-weight:600;">📊 看板</a></li>
+                <li class="nav-item"><a class="nav-link fw-bold" href="/checkin" style="font-size:1rem;padding:4px 12px;">✅ 打卡</a></li>
             </ul>
 
-            <!-- 右侧：操作区 -->
-            <ul class="navbar-nav align-items-lg-center" style="gap:4px;">
-                <!-- 管理员 -->
-                <span sec:authorize="hasRole('ADMIN')">
-                    <li class="nav-item"><a class="nav-link" href="/admin/activities" style="font-size:1.1rem;">⚙️</a></li>
+            <!-- 右侧：横行 -->
+            <span sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link d-inline" href="/admin/activities" style="font-size:1rem;">⚙️</a>
+            </span>
+            <span sec:authorize="isAuthenticated()">
+                <a class="nav-link d-inline position-relative" href="/user/notifications" style="font-size:1rem;">🔔 通知
+                    <span class="position-absolute translate-middle badge rounded-pill bg-danger"
+                        th:if="${unreadCount != null and unreadCount > 0}"
+                        th:text="${unreadCount}"
+                        style="top:0;right:-6px;font-size:0.55rem;padding:1px 4px;"></span>
+                </a>
+                <span class="nav-item dropdown d-inline">
+                    <a class="nav-link dropdown-toggle d-inline" href="#" data-bs-toggle="dropdown" style="font-size:1rem;">👤 我的</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/user/profile">👤 个人中心</a></li>
+                        <li><a class="dropdown-item" href="/my/medals">🏅 我的勋章</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">🚪 退出登录</a></li>
+                    </ul>
                 </span>
-
-                <!-- 登录后 -->
-                <span sec:authorize="isAuthenticated()">
-                    <li class="nav-item position-relative">
-                        <a class="nav-link" href="/user/notifications" style="font-size:1.1rem;">🔔 通知
-                            <span class="position-absolute translate-middle badge rounded-pill bg-danger"
-                                th:if="${unreadCount != null and unreadCount > 0}"
-                                th:text="${unreadCount}"
-                                style="top:2px;right:-6px;font-size:0.6rem;padding:1px 5px;"></span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold" href="/checkin" style="font-size:1.1rem;">✅ 打卡</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" style="font-size:1.1rem;">👤 我的</a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/user/profile">👤 个人中心</a></li>
-                            <li><a class="dropdown-item" href="/my/medals">🏅 我的勋章</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/logout">🚪 退出登录</a></li>
-                        </ul>
-                    </li>
-                </span>
-
-                <!-- 未登录 -->
-                <span sec:authorize="!isAuthenticated()">
-                    <li class="nav-item"><a class="nav-link" href="/login">登录</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/register" style="font-weight:700;">注册</a></li>
-                </span>
-            </ul>
+            </span>
+            <span sec:authorize="!isAuthenticated()">
+                <a class="nav-link d-inline" href="/login" style="font-size:1rem;">登录</a>
+                <a class="nav-link d-inline" href="/register" style="font-weight:700;font-size:1rem;">注册</a>
+            </span>
         </div>
     </div>
 </nav>
 <script>
+(function(){
+    var nav=document.querySelector('.navbar-joy');
+    if(!nav)return;
+    var hero=document.querySelector('.joy-hero');
+    if(hero){window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',window.scrollY>hero.offsetHeight-60);});}
+    else{nav.classList.add('scrolled');}
+})();
 (function() {
     var path = location.pathname;
     document.querySelectorAll('.navbar-joy .nav-link').forEach(function(a) {
