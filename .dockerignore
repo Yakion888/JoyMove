@@ -1,0 +1,14 @@
+target/classes/
+target/test-classes/
+target/surefire-reports/
+target/maven-status/
+.git/
+.gitignore
+*.md
+demo_data.sql
+setup_demo.sql
+logs/
+uploads/
+.idea/
+*.iml
+node_modules/

@@ -55,6 +55,7 @@ com\sportsblog\dto\FamilyStatsDTO.class
 com\sportsblog\entity\CommunityInteraction.class
 com\sportsblog\service\AIRecommendationService$1.class
 com\sportsblog\service\UserService.class
+com\sportsblog\config\GlobalModelAdvice.class
 com\sportsblog\dto\MomentDetailVO.class
 com\sportsblog\mapper\FamilyPlanMapper.class
 com\sportsblog\service\impl\FamilyMomentServiceImpl.class

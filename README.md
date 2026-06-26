@@ -257,10 +257,9 @@ src/main/java/com/sportsblog/
 
 ## 📝 待办
 
-- [ ] 部署到公网（阿里云/腾讯云免费试用）
+- [ ] 执行 `railway up` 完成公网部署（详见 [DEPLOY.md](DEPLOY.md)）
+- [ ] 补充 Prompt 工程文档
 - [ ] 单元测试覆盖核心 Service
-- [ ] 移动端 PWA 适配
-- [ ] CI/CD 流水线
 
 ---
 
