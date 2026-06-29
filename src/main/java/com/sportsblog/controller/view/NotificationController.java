@@ -1,4 +1,4 @@
-package com.sportsblog.controller;
+package com.sportsblog.controller.view;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

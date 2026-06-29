@@ -1,4 +1,4 @@
-package com.sportsblog.controller;
+package com.sportsblog.controller.view;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;

@@ -14,14 +14,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**
  * 运动计划 API 控制器
  */
 @RestController
+@Validated
 @Tag(name = "运动计划", description = "创建和管理运动计划")
 public class FamilyPlanApiController {
 
@@ -36,8 +42,8 @@ public class FamilyPlanApiController {
 
     @Operation(summary = "创建运动计划")
     @PostMapping("/api/plan/create")
-    public Result<?> create(@RequestParam Long projectId,
-                            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate plannedDate) {
+    public Result<?> create(@RequestParam @NotNull Long projectId,
+                            @RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate plannedDate) {
         User user = getCurrentUser();
         FamilyPlan plan = new FamilyPlan();
         plan.setUserId(user.getId());
@@ -49,24 +55,24 @@ public class FamilyPlanApiController {
 
     @Operation(summary = "完成计划")
     @PostMapping("/api/plan/complete")
-    public Result<?> complete(@RequestParam Long planId,
-                              @RequestParam(required = false) Integer actualDuration,
-                              @RequestParam(required = false) String childFeedback) {
+    public Result<?> complete(@RequestParam @NotNull Long planId,
+                              @RequestParam(required = false) @Min(1) Integer actualDuration,
+                              @RequestParam(required = false) @Size(max = 500) String childFeedback) {
         planService.complete(planId, actualDuration, childFeedback);
         return Result.success("计划已完成！");
     }
 
     @Operation(summary = "跳过计划")
     @PostMapping("/api/plan/skip")
-    public Result<?> skip(@RequestParam Long planId) {
+    public Result<?> skip(@RequestParam @NotNull Long planId) {
         planService.skip(planId);
         return Result.success("计划已跳过");
     }
 
     @Operation(summary = "计划日历", description = "按日期范围查询计划")
     @GetMapping("/api/plan/calendar")
-    public Result<?> getCalendar(@RequestParam String startDate,
-                                 @RequestParam String endDate) {
+    public Result<?> getCalendar(@RequestParam @NotBlank String startDate,
+                                 @RequestParam @NotBlank String endDate) {
         User user = getCurrentUser();
         return Result.success(planService.getByDateRange(user.getId(), startDate, endDate));
     }

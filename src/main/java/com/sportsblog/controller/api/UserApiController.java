@@ -16,7 +16,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
@@ -90,7 +93,7 @@ public class UserApiController {
     @Operation(summary = "添加孩子")
     @PostMapping("/user/child/add")
     public Result<?> addChild(@RequestParam @NotBlank String name,
-                              @RequestParam Integer gender,
+                              @RequestParam @Min(0) @Max(1) Integer gender,
                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birthDate) {
         User user = getCurrentUser();
         ChildProfile child = new ChildProfile();
@@ -104,7 +107,7 @@ public class UserApiController {
 
     @Operation(summary = "更新孩子信息")
     @PostMapping("/user/child/update")
-    public Result<?> updateChild(@RequestParam Long childId,
+    public Result<?> updateChild(@RequestParam @NotNull Long childId,
                                  @RequestParam(required = false) String name,
                                  @RequestParam(required = false) Integer gender,
                                  @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birthDate) {

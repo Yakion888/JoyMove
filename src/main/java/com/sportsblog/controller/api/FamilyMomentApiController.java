@@ -3,6 +3,7 @@ package com.sportsblog.controller.api;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sportsblog.common.Result;
 import com.sportsblog.common.ResultCode;
+import com.sportsblog.dto.MomentDetailVO;
 import com.sportsblog.entity.FamilyMoment;
 import com.sportsblog.entity.User;
 import com.sportsblog.mapper.UserMapper;
@@ -13,15 +14,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 /**
  * 运动记录 API 控制器
  */
 @RestController
+@Validated
 @Tag(name = "运动打卡", description = "创建和管理运动记录")
 public class FamilyMomentApiController {
 
@@ -33,16 +37,16 @@ public class FamilyMomentApiController {
 
     @Operation(summary = "创建打卡记录")
     @PostMapping("/api/moment/create")
-    public Result<?> create(@RequestParam Long projectId,
-                            @RequestParam Long childId,
+    public Result<?> create(@RequestParam @NotNull Long projectId,
+                            @RequestParam @NotNull Long childId,
                             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate recordDate,
-                            @RequestParam(required = false) Integer duration,
-                            @RequestParam(required = false) String location,
-                            @RequestParam(required = false) String content,
-                            @RequestParam(required = false) Integer emotion,
-                            @RequestParam(required = false) Integer stars,
+                            @RequestParam(required = false) @Min(1) @Max(480) Integer duration,
+                            @RequestParam(required = false) @Size(max = 200) String location,
+                            @RequestParam(required = false) @Size(max = 2000) String content,
+                            @RequestParam(required = false) @Min(1) @Max(4) Integer emotion,
+                            @RequestParam(required = false) @Min(1) @Max(5) Integer stars,
                             @RequestParam(defaultValue = "1") Integer isPublic,
-                            @RequestParam(required = false) String tags,
+                            @RequestParam(required = false) @Size(max = 200) String tags,
                             @RequestParam(required = false) MultipartFile image) {
         User user = getCurrentUser();
         if (user == null) return Result.error(ResultCode.UNAUTHORIZED);
@@ -64,32 +68,32 @@ public class FamilyMomentApiController {
 
     @Operation(summary = "创建打卡记录（旧路径兼容）")
     @PostMapping("/api/moment/save")
-    public Result<?> save(@RequestParam Long projectId,
-                          @RequestParam Long childId,
+    public Result<?> save(@RequestParam @NotNull Long projectId,
+                          @RequestParam @NotNull Long childId,
                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate recordDate,
-                          @RequestParam(required = false) Integer duration,
-                          @RequestParam(required = false) String location,
-                          @RequestParam(required = false) String content,
-                          @RequestParam(required = false) Integer emotion,
-                          @RequestParam(required = false) Integer stars,
+                          @RequestParam(required = false) @Min(1) @Max(480) Integer duration,
+                          @RequestParam(required = false) @Size(max = 200) String location,
+                          @RequestParam(required = false) @Size(max = 2000) String content,
+                          @RequestParam(required = false) @Min(1) @Max(4) Integer emotion,
+                          @RequestParam(required = false) @Min(1) @Max(5) Integer stars,
                           @RequestParam(defaultValue = "1") Integer isPublic,
-                          @RequestParam(required = false) String tags,
+                          @RequestParam(required = false) @Size(max = 200) String tags,
                           @RequestParam(required = false) MultipartFile image) {
         return create(projectId, childId, recordDate, duration, location, content, emotion, stars, isPublic, tags, image);
     }
 
     @Operation(summary = "用户运动记录列表")
     @GetMapping("/api/moment/list")
-    public Result<?> list(@RequestParam(defaultValue = "1") int page,
-                          @RequestParam(defaultValue = "10") int size) {
+    public Result<?> list(@RequestParam(defaultValue = "1") @Min(1) int page,
+                          @RequestParam(defaultValue = "10") @Min(1) @Max(50) int size) {
         User user = getCurrentUser();
         return Result.success(momentService.getUserMoments(user.getId(), page, size));
     }
 
     @Operation(summary = "月度运动日历")
     @GetMapping("/api/moment/calendar")
-    public Result<?> calendar(@RequestParam int year,
-                              @RequestParam int month) {
+    public Result<?> calendar(@RequestParam @Min(2020) int year,
+                              @RequestParam @Min(1) @Max(12) int month) {
         User user = getCurrentUser();
         return Result.success(momentService.getUserCalendar(user.getId(), year, month));
     }
@@ -97,13 +101,13 @@ public class FamilyMomentApiController {
     @Operation(summary = "运动记录详情 JSON")
     @GetMapping("/api/moment/{id}")
     public Result<?> getDetail(@PathVariable Long id) {
-        com.sportsblog.dto.MomentDetailVO vo = momentService.getDetailById(id);
+        MomentDetailVO vo = momentService.getDetailById(id);
         return vo != null ? Result.success(vo) : Result.error("记录不存在");
     }
 
     @Operation(summary = "点赞/取消点赞")
     @PostMapping("/api/moment/like")
-    public Result<?> like(@RequestParam Long momentId) {
+    public Result<?> like(@RequestParam @NotNull Long momentId) {
         User user = getCurrentUser();
         boolean liked = momentService.toggleLike(momentId, user.getId());
         return Result.success(liked ? "已点赞" : "已取消");

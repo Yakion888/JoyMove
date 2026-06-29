@@ -9,8 +9,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 /**
@@ -19,6 +25,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
+@Validated
 @Tag(name = "管理后台", description = "审核、统计、项目管理")
 public class AdminApiController {
 
@@ -49,15 +56,15 @@ public class AdminApiController {
 
     @Operation(summary = "按状态查询运动记录")
     @GetMapping("/api/moments")
-    public Result<?> listMoments(@RequestParam(defaultValue = "0") int status) {
+    public Result<?> listMoments(@RequestParam(defaultValue = "0") @Min(0) @Max(2) int status) {
         return Result.success(momentMapper.selectByStatus(status));
     }
 
     @Operation(summary = "审核运动记录", description = "通过或驳回")
     @PostMapping("/activity/audit")
-    public Result<?> audit(@RequestParam Long momentId,
-                           @RequestParam Integer status,
-                           @RequestParam(required = false) String rejectReason) {
+    public Result<?> audit(@RequestParam @NotNull Long momentId,
+                           @RequestParam @NotNull @Min(0) @Max(2) Integer status,
+                           @RequestParam(required = false) @Size(max = 500) String rejectReason) {
         FamilyMoment moment = momentMapper.selectById(momentId);
         if (moment == null) return Result.error("记录不存在");
         if (status == 1) {
@@ -92,14 +99,14 @@ public class AdminApiController {
 
     @Operation(summary = "保存/更新运动项目")
     @PostMapping("/api/project/save")
-    public Result<?> saveProject(@RequestBody SportProject project) {
+    public Result<?> saveProject(@Valid @RequestBody SportProject project) {
         projectService.saveOrUpdate(project);
         return Result.success("保存成功");
     }
 
     @Operation(summary = "删除运动项目")
     @PostMapping("/api/project/delete")
-    public Result<?> deleteProject(@RequestParam Long id) {
+    public Result<?> deleteProject(@RequestParam @NotNull Long id) {
         projectService.delete(id);
         return Result.success("已删除");
     }

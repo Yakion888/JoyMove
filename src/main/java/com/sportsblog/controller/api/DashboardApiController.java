@@ -10,12 +10,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 /**
  * 数据看板 API 控制器
  */
 @RestController
+@Validated
 @Tag(name = "数据看板", description = "运动数据统计与趋势")
 public class DashboardApiController {
 
@@ -34,7 +39,7 @@ public class DashboardApiController {
 
     @Operation(summary = "月度趋势", description = "近 N 个月的运动次数和时长趋势")
     @GetMapping("/api/dashboard/trend")
-    public Result<?> trend(@RequestParam(defaultValue = "6") int months) {
+    public Result<?> trend(@RequestParam(defaultValue = "6") @Min(1) @Max(24) int months) {
         User user = getCurrentUser();
         return Result.success(dashboardService.getMonthlyTrend(user.getId(), months));
     }

@@ -10,12 +10,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * 社区互动控制器
  */
 @RestController
+@Validated
 @Tag(name = "社区互动", description = "评论与回复")
 public class CommunityInteractionController {
 
@@ -27,8 +33,8 @@ public class CommunityInteractionController {
 
     @Operation(summary = "发布互动", description = "发表评论或回复")
     @PostMapping("/api/interaction/save")
-    public Result<?> save(@RequestParam Long momentId,
-                          @RequestParam String content,
+    public Result<?> save(@RequestParam @NotNull Long momentId,
+                          @RequestParam @NotBlank @Size(max = 500) String content,
                           @RequestParam(required = false) Long parentId) {
         User user = getCurrentUser();
         interactionService.save(momentId, content, parentId, user.getId());
@@ -37,7 +43,7 @@ public class CommunityInteractionController {
 
     @Operation(summary = "获取互动列表", description = "获取指定动态的评论树")
     @GetMapping("/api/interaction/list")
-    public Result<?> list(@RequestParam Long momentId) {
+    public Result<?> list(@RequestParam @NotNull Long momentId) {
         return Result.success(interactionService.getTreeFlat(momentId));
     }
 
