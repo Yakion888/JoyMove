@@ -5,16 +5,18 @@ import com.sportsblog.common.Result;
 import com.sportsblog.entity.User;
 import com.sportsblog.mapper.UserMapper;
 import com.sportsblog.service.CommunityInteractionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * 社区互动控制器
  */
-@Controller
+@RestController
+@Tag(name = "社区互动", description = "评论与回复")
 public class CommunityInteractionController {
 
     @Autowired
@@ -23,9 +25,8 @@ public class CommunityInteractionController {
     @Autowired
     private UserMapper userMapper;
 
-    /** 发布互动（评论/回复） */
+    @Operation(summary = "发布互动", description = "发表评论或回复")
     @PostMapping("/api/interaction/save")
-    @ResponseBody
     public Result<?> save(@RequestParam Long momentId,
                           @RequestParam String content,
                           @RequestParam(required = false) Long parentId) {
@@ -34,9 +35,8 @@ public class CommunityInteractionController {
         return Result.success("发布成功");
     }
 
-    /** 获取互动列表 */
+    @Operation(summary = "获取互动列表", description = "获取指定动态的评论树")
     @GetMapping("/api/interaction/list")
-    @ResponseBody
     public Result<?> list(@RequestParam Long momentId) {
         return Result.success(interactionService.getTreeFlat(momentId));
     }

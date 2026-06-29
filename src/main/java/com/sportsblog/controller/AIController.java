@@ -6,16 +6,18 @@ import com.sportsblog.entity.User;
 import com.sportsblog.mapper.UserMapper;
 import com.sportsblog.service.AIMonthlyReportService;
 import com.sportsblog.service.AIRecommendationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * AI 功能控制器
  */
-@Controller
+@RestController
+@Tag(name = "AI 功能", description = "AI 运动推荐与成长报告")
 public class AIController {
 
     @Autowired
@@ -27,18 +29,16 @@ public class AIController {
     @Autowired
     private UserMapper userMapper;
 
-    /** AI 运动推荐 */
+    @Operation(summary = "AI 运动推荐", description = "根据孩子、天气条件推荐运动项目")
     @GetMapping("/api/ai/recommend")
-    @ResponseBody
     public Result<?> recommend(@RequestParam Long childId,
                                @RequestParam(defaultValue = "晴天") String weather,
                                @RequestParam(defaultValue = "3") int count) {
         return Result.success(recommendationService.recommend(childId, weather, count));
     }
 
-    /** AI 月度成长报告 */
+    @Operation(summary = "AI 月度成长报告", description = "生成指定孩子指定月份的成长报告")
     @GetMapping("/api/ai/report")
-    @ResponseBody
     public Result<?> report(@RequestParam Long childId,
                             @RequestParam int year,
                             @RequestParam int month) {

@@ -46,9 +46,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate weekStart = today.with(DayOfWeek.MONDAY);
         LocalDate monthStart = today.withDayOfMonth(1);
 
-        // Query all user moments
-        List<FamilyMoment> all = momentMapper.selectByUserIdPage(
-            new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, 1000), userId).getRecords();
+        // Query all published user moments
+        List<FamilyMoment> all = momentMapper.selectAllByUserId(userId);
 
         int weekCount = 0, weekDur = 0, monthCount = 0, monthDur = 0, totalCount = 0, totalDur = 0;
         double emotionSum = 0, starsSum = 0;
@@ -84,8 +83,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<ProjectDistributionDTO> getProjectDistribution(Long userId) {
-        List<FamilyMoment> all = momentMapper.selectByUserIdPage(
-            new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, 1000), userId).getRecords();
+        List<FamilyMoment> all = momentMapper.selectAllByUserId(userId);
 
         Map<Long, Integer> countMap = new LinkedHashMap<>();
         int total = 0;

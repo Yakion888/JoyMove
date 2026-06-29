@@ -4,8 +4,10 @@ com\sportsblog\entity\ChildProfile.class
 com\sportsblog\mapper\SportStatisticsMapper.class
 com\sportsblog\service\CommunityInteractionService.class
 com\sportsblog\dto\InteractionVO.class
+com\sportsblog\controller\api\FamilyMomentApiController.class
 com\sportsblog\dto\GrowthTimelineDTO.class
 com\sportsblog\service\SportProjectService.class
+com\sportsblog\controller\api\DashboardApiController.class
 com\sportsblog\controller\UserController.class
 com\sportsblog\dto\CheckInCalendarDTO.class
 com\sportsblog\controller\FamilyPlanController.class
@@ -16,6 +18,7 @@ com\sportsblog\service\CheckInService.class
 com\sportsblog\service\impl\SportProjectServiceImpl.class
 com\sportsblog\dto\StreakInfoDTO.class
 com\sportsblog\mapper\FamilyMomentMapper.class
+com\sportsblog\controller\api\UserApiController.class
 com\sportsblog\service\impl\UserDetailsServiceImpl.class
 com\sportsblog\dto\MonthlyCalendarDTO$CalendarDay.class
 com\sportsblog\entity\FamilyPlan.class
@@ -48,6 +51,8 @@ com\sportsblog\common\ResultCode.class
 com\sportsblog\entity\SportProject.class
 com\sportsblog\entity\Notification.class
 com\sportsblog\entity\CheckIn.class
+com\sportsblog\controller\api\CommunityApiController.class
+com\sportsblog\controller\api\FamilyPlanApiController.class
 com\sportsblog\common\BusinessException.class
 com\sportsblog\service\AIMonthlyReportService.class
 com\sportsblog\common\GlobalExceptionHandler.class
@@ -72,12 +77,15 @@ com\sportsblog\SportsBlogApplication.class
 com\sportsblog\entity\SportStatistics.class
 com\sportsblog\dto\MedalSummaryDTO.class
 com\sportsblog\config\WebMvcConfig.class
+com\sportsblog\controller\api\AdminApiController.class
 com\sportsblog\mapper\CheckInMapper.class
 com\sportsblog\controller\AIController.class
 com\sportsblog\service\impl\FamilyPlanServiceImpl$ScoredPlan.class
 com\sportsblog\service\FamilyMomentService.class
 com\sportsblog\controller\CommunityInteractionController.class
+com\sportsblog\controller\api\NotificationApiController.class
 com\sportsblog\service\impl\CommunityInteractionServiceImpl.class
+com\sportsblog\controller\api\MedalApiController.class
 com\sportsblog\controller\MedalController.class
 com\sportsblog\dto\MonthlyTrendDTO.class
 com\sportsblog\mapper\MedalMapper.class

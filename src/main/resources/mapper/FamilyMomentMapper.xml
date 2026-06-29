@@ -52,6 +52,12 @@
         ORDER BY create_time DESC
     </select>
 
+    <select id="selectAllByUserId" resultMap="BaseResultMap">
+        SELECT * FROM family_moment
+        WHERE user_id = #{userId} AND is_deleted = 0 AND status = 1
+        ORDER BY record_date DESC
+    </select>
+
     <select id="searchPublished" resultMap="BaseResultMap">
         SELECT * FROM family_moment
         WHERE status = 1 AND is_public = 1 AND is_deleted = 0

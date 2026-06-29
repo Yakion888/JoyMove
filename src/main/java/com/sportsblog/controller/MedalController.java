@@ -1,7 +1,6 @@
 package com.sportsblog.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.sportsblog.common.Result;
 import com.sportsblog.entity.User;
 import com.sportsblog.mapper.UserMapper;
 import com.sportsblog.service.MedalService;
@@ -10,10 +9,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * 勋章控制器
+ * 勋章页面控制器
  */
 @Controller
 public class MedalController {
@@ -24,7 +23,6 @@ public class MedalController {
     @Autowired
     private UserMapper userMapper;
 
-    /** 勋章馆页面 */
     @GetMapping("/medals")
     public String medalsPage(Model model) {
         model.addAttribute("allMedals", medalService.getAll());
@@ -36,7 +34,6 @@ public class MedalController {
         return "medals";
     }
 
-    /** 我的勋章（需登录） */
     @GetMapping("/my/medals")
     public String myMedalsPage(Model model) {
         User user = getCurrentUser();
@@ -44,15 +41,6 @@ public class MedalController {
         model.addAttribute("progress", medalService.getProgress(user.getId()));
         model.addAttribute("allMedals", medalService.getAll());
         return "medals";
-    }
-
-    /** 获取用户勋章进度 API */
-    @GetMapping("/api/medals/progress")
-    @ResponseBody
-    public Result<?> getProgress() {
-        User user = getCurrentUser();
-        if (user == null) return Result.error(401, "请先登录");
-        return Result.success(medalService.getProgress(user.getId()));
     }
 
     private User getCurrentUser() {

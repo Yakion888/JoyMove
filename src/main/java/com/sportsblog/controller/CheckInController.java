@@ -6,16 +6,18 @@ import com.sportsblog.entity.User;
 import com.sportsblog.mapper.UserMapper;
 import com.sportsblog.service.CheckInService;
 import com.sportsblog.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * 独立打卡控制器（未来扩展用）
  */
-@Controller
+@RestController
+@Tag(name = "独立打卡", description = "基于 check_in 表的独立打卡功能")
 public class CheckInController {
 
     @Autowired
@@ -27,9 +29,8 @@ public class CheckInController {
     @Autowired
     private UserMapper userMapper;
 
-    /** 执行打卡（独立打卡，可附带运动记录ID） */
+    @Operation(summary = "执行打卡", description = "独立打卡，可附带运动记录 ID")
     @PostMapping("/api/checkin")
-    @ResponseBody
     public Result<?> doCheckIn(@RequestParam Long childId,
                                @RequestParam(required = false) Long momentId) {
         User user = getCurrentUser();
@@ -37,9 +38,8 @@ public class CheckInController {
         return Result.success("打卡成功！");
     }
 
-    /** 获取月度日历数据 */
+    @Operation(summary = "获取月度日历", description = "查询指定月份的打卡日历")
     @GetMapping("/api/checkin/calendar")
-    @ResponseBody
     public Result<?> getCalendar(@RequestParam Long childId,
                                  @RequestParam int year,
                                  @RequestParam int month) {
@@ -47,9 +47,8 @@ public class CheckInController {
         return Result.success(checkInService.getMonthlyCalendar(user.getId(), childId, year, month));
     }
 
-    /** 获取当前连续天数 */
+    @Operation(summary = "获取连续打卡天数", description = "查询当前连续打卡天数")
     @GetMapping("/api/checkin/streak")
-    @ResponseBody
     public Result<?> getStreak(@RequestParam Long childId) {
         User user = getCurrentUser();
         return Result.success(checkInService.getCurrentStreak(user.getId(), childId));

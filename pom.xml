@@ -84,6 +84,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Swagger / OpenAPI 文档 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+
         <!-- Markdown 解析 (flexmark, Java 8 兼容版本) -->
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>

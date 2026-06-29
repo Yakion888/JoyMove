@@ -1,29 +1,36 @@
-package com.sportsblog.controller;
+package com.sportsblog.controller.api;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sportsblog.common.Result;
 import com.sportsblog.entity.User;
 import com.sportsblog.mapper.UserMapper;
+import com.sportsblog.service.MedalService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
- * 社区页面控制器
+ * 勋章 API 控制器
  */
-@Controller
-public class CommunityController {
+@RestController
+@Tag(name = "勋章管理", description = "勋章进度查询")
+public class MedalApiController {
+
+    @Autowired
+    private MedalService medalService;
 
     @Autowired
     private UserMapper userMapper;
 
-    @GetMapping("/community")
-    public String feedPage(Model model) {
+    @Operation(summary = "获取用户勋章进度")
+    @GetMapping("/api/medals/progress")
+    public Result<?> getProgress() {
         User user = getCurrentUser();
-        if (user != null) model.addAttribute("currentUser", user);
-        return "community";
+        if (user == null) return Result.error(401, "请先登录");
+        return Result.success(medalService.getProgress(user.getId()));
     }
 
     private User getCurrentUser() {

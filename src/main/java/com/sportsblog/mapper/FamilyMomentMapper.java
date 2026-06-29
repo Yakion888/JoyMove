@@ -27,6 +27,9 @@ public interface FamilyMomentMapper extends BaseMapper<FamilyMoment> {
     /** 分页查用户记录 */
     IPage<FamilyMoment> selectByUserIdPage(Page<FamilyMoment> page, @Param("userId") Long userId);
 
+    /** 查询用户全部已发布记录（无分页上限，status=1） */
+    List<FamilyMoment> selectAllByUserId(@Param("userId") Long userId);
+
     /** 全文搜索 */
     IPage<FamilyMoment> searchPublished(Page<FamilyMoment> page, @Param("keyword") String keyword);
 

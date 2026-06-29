@@ -287,8 +287,13 @@ $('#checkinForm').on('submit', function(e) {
                 $('#errorBox').removeClass('d-none').text(res.msg || '打卡失败');
             }
         },
-        error: function() {
-            $('#errorBox').removeClass('d-none').text('网络错误');
+        error: function(xhr) {
+            var msg = '网络错误，请稍后重试';
+            try {
+                var res = JSON.parse(xhr.responseText);
+                if (res && res.msg) msg = res.msg;
+            } catch(e) {}
+            $('#errorBox').removeClass('d-none').text(msg);
         },
         complete: function() {
             $('#submitBtn').prop('disabled', false).text('✅ 完成打卡');
