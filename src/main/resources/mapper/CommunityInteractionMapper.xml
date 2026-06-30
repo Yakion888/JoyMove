@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.sportsblog.mapper.CommunityInteractionMapper">
+<mapper namespace="com.joymove.mapper.CommunityInteractionMapper">
 
-    <resultMap id="BaseResultMap" type="com.sportsblog.entity.CommunityInteraction">
+    <resultMap id="BaseResultMap" type="com.joymove.entity.CommunityInteraction">
         <id column="id" property="id"/>
         <result column="moment_id" property="momentId"/>
         <result column="user_id" property="userId"/>

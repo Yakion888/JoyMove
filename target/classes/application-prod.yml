@@ -1,0 +1,36 @@
+# =============================================
+# 悦动宝 JoyMove — 生产环境配置
+# =============================================
+# 敏感信息通过环境变量注入，此处为占位符
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/sports_blog?useUnicode=true&characterEncoding=UTF-8&useSSL=true&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+
+  thymeleaf:
+    cache: true
+
+  devtools:
+    restart:
+      enabled: false
+
+# 生产环境不输出 SQL 日志
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+logging:
+  level:
+    com.joymove: warn
+    org.springframework.security: warn
+
+deepseek:
+  api:
+    key: ${DEEPSEEK_API_KEY:}
+    url: https://api.deepseek.com/v1/chat/completions

@@ -1,9 +1,29 @@
 # =============================================
-# 悦动宝 JoyMove — 亲子运动陪伴平台 应用配置
+# 悦动宝 JoyMove — 公共配置（所有环境共享）
 # =============================================
+# 环境切换：启动时指定 -Dspring.profiles.active=dev|prod
+# 默认激活：dev
+
+spring:
+  profiles:
+    active: dev
+
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 10MB
+
+  sql:
+    init:
+      mode: never
+
+  thymeleaf:
+    encoding: UTF-8
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
 
 server:
-  port: 8080
   servlet:
     context-path: /
     encoding:
@@ -11,77 +31,20 @@ server:
       enabled: true
       force: true
 
-spring:
-  # 数据源配置 (MySQL 8.0)
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/sports_blog?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: root
-    password: root
-
-  # Thymeleaf 模板引擎
-  thymeleaf:
-    cache: false                           # 开发环境关闭缓存
-    encoding: UTF-8
-    mode: HTML
-    prefix: classpath:/templates/
-    suffix: .html
-
-  # 文件上传限制
-  servlet:
-    multipart:
-      max-file-size: 2MB                   # 单文件最大 2MB
-      max-request-size: 10MB               # 请求体最大 10MB
-
-  # 数据库初始化（关闭自动执行 data.sql，改用 init.sql 手动初始化）
-  sql:
-    init:
-      mode: never
-
-  # DevTools 热部署
-  devtools:
-    restart:
-      enabled: true
-      additional-paths: src/main/java
-
-# MyBatis-Plus 配置
 mybatis-plus:
-  # 实体类扫描包路径
-  type-aliases-package: com.sportsblog.entity
-  # Mapper XML 文件位置
+  type-aliases-package: com.joymove.entity
   mapper-locations: classpath*:/mapper/**/*.xml
-  # 全局配置
   global-config:
     db-config:
-      # 主键类型：数据库自增
       id-type: auto
-      # 逻辑删除字段名
       logic-delete-field: is_deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
-    banner: false                           # 关闭 MyBatis-Plus 启动 banner
-  # 控制台输出 SQL 日志
+    banner: false
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
 
-# 日志级别
-logging:
-  level:
-    com.sportsblog: debug
-    org.springframework.security: debug
-  file:
-    path: ./logs
-
-# 应用自定义配置
 app:
-  # 文件上传路径 (相对于 static 目录)
   upload:
     path: /uploads/
-    max-size: 2097152                      # 2MB = 2 * 1024 * 1024
-
-# DeepSeek API 配置
-deepseek:
-  api:
-    key: sk-6af1bf3910d74f2abaa3ec50286dd4f6                   # 替换为你的 DeepSeek API Key
-    url: https://api.deepseek.com/v1/chat/completions
+    max-size: 2097152

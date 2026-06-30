@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.joymove.SportsBlogApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.292 s - in com.joymove.SportsBlogApplicationTests

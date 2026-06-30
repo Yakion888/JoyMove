@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.sportsblog.mapper.CheckInMapper">
+<mapper namespace="com.joymove.mapper.CheckInMapper">
 
-    <resultMap id="BaseResultMap" type="com.sportsblog.entity.CheckIn">
+    <resultMap id="BaseResultMap" type="com.joymove.entity.CheckIn">
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="child_id" property="childId"/>
