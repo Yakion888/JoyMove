@@ -61,6 +61,9 @@ public class SecurityConfig {
                 .antMatchers("/plans").permitAll()
                 // 勋章馆（公开浏览）
                 .antMatchers("/medals").permitAll()
+                // 用户公开主页（仅数字 ID 路径）
+                .regexMatchers("/user/\\d+").permitAll()
+                .regexMatchers("/api/user/\\d+/.*").permitAll()
                 // 管理后台仅 ADMIN
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 // 其他请求需要登录

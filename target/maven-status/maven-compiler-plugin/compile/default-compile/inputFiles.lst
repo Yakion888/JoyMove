@@ -42,11 +42,13 @@ C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\common\ResultCode
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\entity\ChildProfile.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\service\impl\NotificationServiceImpl.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\config\WebMvcConfig.java
+C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\config\CacheConfig.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\dto\FamilyStatsDTO.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\dto\MedalProgressDTO.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\service\AIClientService.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\service\impl\SportProjectServiceImpl.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\controller\view\MedalController.java
+C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\dto\PublicProfileDTO.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\service\FamilyPlanService.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\service\impl\CommunityInteractionServiceImpl.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\service\MedalService.java
@@ -65,6 +67,7 @@ C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\controller\api\Ad
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\dto\MonthlyTrendDTO.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\dto\MomentDetailVO.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\service\impl\UserServiceImpl.java
+C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\controller\api\PublicProfileApiController.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\common\GlobalExceptionHandler.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\mapper\SportStatisticsMapper.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\dto\ProjectDistributionDTO.java
@@ -77,6 +80,7 @@ C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\dto\DashboardOver
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\mapper\ChildProfileMapper.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\service\impl\DashboardServiceImpl.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\config\SecurityConfig.java
+C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\controller\view\PublicProfileController.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\SportsBlogApplication.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\entity\Medal.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\dto\CheckInCalendarDTO.java

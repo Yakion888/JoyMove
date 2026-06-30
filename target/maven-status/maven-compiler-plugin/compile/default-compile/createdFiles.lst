@@ -8,12 +8,14 @@ com\joymove\service\impl\CommunityInteractionServiceImpl.class
 com\joymove\controller\view\MedalController.class
 com\joymove\dto\GrowthTimelineDTO.class
 com\joymove\controller\api\FamilyMomentApiController.class
+com\joymove\dto\PublicProfileDTO.class
 com\joymove\service\impl\UserServiceImpl.class
 com\joymove\entity\Medal.class
 com\joymove\controller\CommunityInteractionController.class
 com\joymove\mapper\MedalRecordMapper.class
 com\joymove\config\MybatisPlusConfig.class
 com\joymove\dto\GrowthTimelineDTO$TimelineNode.class
+com\joymove\controller\api\PublicProfileApiController.class
 com\joymove\mapper\ChildProfileMapper.class
 com\joymove\dto\InteractionVO.class
 com\joymove\service\AIMonthlyReportService.class
@@ -49,6 +51,7 @@ com\joymove\service\AIClientService.class
 com\joymove\service\impl\MedalServiceImpl.class
 com\joymove\service\MedalService.class
 com\joymove\entity\CommunityInteraction.class
+com\joymove\config\CacheConfig.class
 com\joymove\mapper\CommunityInteractionMapper.class
 com\joymove\controller\api\DashboardApiController.class
 com\joymove\controller\api\NotificationApiController.class
@@ -58,6 +61,7 @@ com\joymove\dto\DashboardOverviewDTO.class
 com\joymove\service\FamilyMomentService.class
 com\joymove\common\Result.class
 com\joymove\config\RestTemplateConfig.class
+com\joymove\controller\view\PublicProfileController.class
 com\joymove\config\MyMetaObjectHandler.class
 com\joymove\service\DashboardService.class
 com\joymove\config\GlobalModelAdvice.class

@@ -9,6 +9,7 @@ import com.joymove.mapper.MedalRecordMapper;
 import com.joymove.service.MedalService;
 import com.joymove.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class MedalServiceImpl implements MedalService {
     private NotificationService notificationService;
 
     @Override
+    @Cacheable(value = "medal", key = "'all'")
     public List<Medal> getAll() {
         return medalMapper.selectList(null);
     }

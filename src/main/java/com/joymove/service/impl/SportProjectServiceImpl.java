@@ -5,6 +5,8 @@ import com.joymove.entity.SportProject;
 import com.joymove.mapper.SportProjectMapper;
 import com.joymove.service.SportProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ public class SportProjectServiceImpl implements SportProjectService {
     private SportProjectMapper projectMapper;
 
     @Override
+    @Cacheable(value = "sportProject", key = "'enabled'")
     public List<SportProject> getAllEnabled() {
         LambdaQueryWrapper<SportProject> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SportProject::getStatus, 1);
@@ -26,11 +29,13 @@ public class SportProjectServiceImpl implements SportProjectService {
     }
 
     @Override
+    @Cacheable(value = "sportProject", key = "'all'")
     public List<SportProject> getAll() {
         return projectMapper.selectList(null);
     }
 
     @Override
+    @Cacheable(value = "sportProject", key = "#id")
     public SportProject getById(Long id) {
         return projectMapper.selectById(id);
     }
@@ -45,6 +50,7 @@ public class SportProjectServiceImpl implements SportProjectService {
     }
 
     @Override
+    @CacheEvict(value = "sportProject", allEntries = true)
     public void saveOrUpdate(SportProject project) {
         if (project.getId() == null) {
             projectMapper.insert(project);
@@ -56,6 +62,7 @@ public class SportProjectServiceImpl implements SportProjectService {
     }
 
     @Override
+    @CacheEvict(value = "sportProject", allEntries = true)
     public void delete(Long id) {
         projectMapper.deleteById(id);
         log.info("SportProject deleted: id={}", id);

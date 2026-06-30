@@ -1,12 +1,11 @@
 package com.joymove.controller.view;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.joymove.entity.SportProject;
 import com.joymove.entity.User;
-import com.joymove.mapper.SportProjectMapper;
 import com.joymove.mapper.UserMapper;
 import com.joymove.service.CommunityInteractionService;
 import com.joymove.service.FamilyMomentService;
+import com.joymove.service.SportProjectService;
 import com.joymove.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -28,7 +27,7 @@ public class FamilyMomentController {
     private UserService userService;
 
     @Autowired
-    private SportProjectMapper projectMapper;
+    private SportProjectService projectService;
 
     @Autowired
     private CommunityInteractionService interactionService;
@@ -40,8 +39,7 @@ public class FamilyMomentController {
     public String checkinPage(Model model) {
         User user = getCurrentUser();
         model.addAttribute("children", userService.getChildren(user.getId()));
-        model.addAttribute("projects", projectMapper.selectList(
-            new LambdaQueryWrapper<SportProject>().eq(SportProject::getStatus, 1)));
+        model.addAttribute("projects", projectService.getAllEnabled());
         return "checkin";
     }
 
@@ -49,8 +47,7 @@ public class FamilyMomentController {
     public String publishPage(Model model) {
         User user = getCurrentUser();
         model.addAttribute("children", userService.getChildren(user.getId()));
-        model.addAttribute("projects", projectMapper.selectList(
-            new LambdaQueryWrapper<SportProject>().eq(SportProject::getStatus, 1)));
+        model.addAttribute("projects", projectService.getAllEnabled());
         return "checkin";
     }
 

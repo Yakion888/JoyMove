@@ -5,9 +5,9 @@ import com.joymove.common.Result;
 import com.joymove.entity.FamilyPlan;
 import com.joymove.entity.SportProject;
 import com.joymove.entity.User;
-import com.joymove.mapper.SportProjectMapper;
 import com.joymove.mapper.UserMapper;
 import com.joymove.service.FamilyPlanService;
+import com.joymove.service.SportProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class FamilyPlanApiController {
     private FamilyPlanService planService;
 
     @Autowired
-    private SportProjectMapper projectMapper;
+    private SportProjectService projectService;
 
     @Autowired
     private UserMapper userMapper;
@@ -80,8 +80,7 @@ public class FamilyPlanApiController {
     @Operation(summary = "运动项目列表 JSON")
     @GetMapping("/api/projects")
     public Result<?> projectsJson() {
-        return Result.success(projectMapper.selectList(
-            new LambdaQueryWrapper<SportProject>().eq(SportProject::getStatus, 1)));
+        return Result.success(projectService.getAllEnabled());
     }
 
     private User getCurrentUser() {

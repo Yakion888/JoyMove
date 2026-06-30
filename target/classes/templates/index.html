@@ -59,7 +59,7 @@
                         </div>
                         <p class="mt-2 mb-1" th:text="${#strings.abbreviate(m.content, 120)}">内容...</p>
                         <div class="d-flex justify-content-between text-muted small">
-                            <span>👤 <span th:text="${m.authorNickname}">作者</span>
+                            <span>👤 <a th:href="@{/user/{id}(id=${m.userId})}" class="text-decoration-none fw-bold" th:text="${m.authorNickname}">作者</a>
                                 <span th:if="${m.childName != null}">· 👶 <span th:text="${m.childName}">孩子</span></span>
                             </span>
                             <span>

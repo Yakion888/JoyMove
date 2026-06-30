@@ -11,6 +11,7 @@ import com.joymove.service.FamilyMomentService;
 import com.joymove.service.MedalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +56,7 @@ public class FamilyMomentServiceImpl implements FamilyMomentService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "userStats", key = "#moment.userId")
     public FamilyMoment save(FamilyMoment moment, MultipartFile file) {
         moment.setStatus(1); // demo直接发布
         moment.setLikeCount(0);
