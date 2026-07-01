@@ -97,7 +97,6 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
-        <!-- Jackson（Redis 序列化用，spring-boot-starter-web 已间接引入） -->
 
         <!-- Markdown 解析 (flexmark, Java 8 兼容版本) -->
         <dependency>

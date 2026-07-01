@@ -7,6 +7,7 @@ import com.joymove.entity.*;
 import com.joymove.mapper.ChildProfileMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
@@ -28,6 +29,7 @@ public class AIMonthlyReportService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Cacheable(value = "aiReport", key = "#childId + ':' + #year + ':' + #month")
     public Map<String, Object> generateReport(Long userId, Long childId, int year, int month) {
         ChildProfile child = childProfileMapper.selectById(childId);
         if (child == null) return Collections.emptyMap();

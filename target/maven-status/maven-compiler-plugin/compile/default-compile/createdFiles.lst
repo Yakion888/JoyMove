@@ -1,4 +1,5 @@
 com\joymove\controller\api\AdminApiController.class
+com\joymove\service\impl\PublicProfileServiceImpl.class
 com\joymove\controller\api\UserApiController.class
 com\joymove\dto\MedalSummaryDTO.class
 com\joymove\mapper\FamilyMomentMapper.class
@@ -13,6 +14,7 @@ com\joymove\service\impl\UserServiceImpl.class
 com\joymove\entity\Medal.class
 com\joymove\controller\CommunityInteractionController.class
 com\joymove\mapper\MedalRecordMapper.class
+com\joymove\config\CacheWarmUp.class
 com\joymove\config\MybatisPlusConfig.class
 com\joymove\dto\GrowthTimelineDTO$TimelineNode.class
 com\joymove\controller\api\PublicProfileApiController.class
@@ -86,6 +88,7 @@ com\joymove\controller\view\FamilyMomentController.class
 com\joymove\service\impl\CheckInServiceImpl.class
 com\joymove\SportsBlogApplication.class
 com\joymove\mapper\CheckInMapper.class
+com\joymove\config\CacheConfig$1.class
 com\joymove\entity\Notification.class
 com\joymove\controller\CheckInController.class
 com\joymove\controller\view\NotificationController.class
