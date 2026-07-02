@@ -11,11 +11,10 @@ COPY src ./src
 RUN mvn clean package -DskipTests -B -q
 
 # -------- 阶段2：运行时 --------
-FROM eclipse-temurin:8-jre-alpine
+FROM eclipse-temurin:8-jre
 WORKDIR /app
-RUN apk add --no-cache tzdata curl && \
-    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
-    echo "Asia/Shanghai" > /etc/timezone
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java -Xmx256m -Xms128m -XX:MaxMetaspaceSize=128m -Djdk.tls.client.protocols=TLSv1.2 -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:-docker} -jar app.jar 2>&1"]

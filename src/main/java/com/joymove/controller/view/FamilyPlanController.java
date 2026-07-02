@@ -32,6 +32,7 @@ public class FamilyPlanController {
     @GetMapping("/plans")
     public String plansPage(Model model) {
         User user = getCurrentUser();
+        if (user == null) return "redirect:/login";
         model.addAttribute("plans", planService.getByUserId(user.getId()));
         model.addAttribute("projects", projectMapper.selectList(
             new LambdaQueryWrapper<SportProject>().eq(SportProject::getStatus, 1)));
