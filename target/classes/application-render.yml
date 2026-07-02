@@ -1,0 +1,5 @@
+# Render 部署专用 — 继承 docker 配置，关闭 Redis 自动配置
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
