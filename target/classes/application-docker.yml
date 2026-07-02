@@ -37,10 +37,12 @@ mybatis-plus:
 
 logging:
   level:
-    com.joymove: info
-    org.springframework.security: warn
-    com.zaxxer.hikari: debug
-    org.springframework.boot.autoconfigure.jdbc: debug
+    root: info
+    com.joymove: debug
+    com.zaxxer.hikari: trace
+    org.springframework.boot: info
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [%thread] %logger{0} - %msg%n"
 
 deepseek:
   api:
