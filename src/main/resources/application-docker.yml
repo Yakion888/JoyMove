@@ -7,7 +7,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:sports_blog}?useUnicode=true&characterEncoding=UTF-8&useSSL=true&requireSSL=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&connectTimeout=20000
+    url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:sports_blog}?useUnicode=true&characterEncoding=UTF-8&useSSL=true&requireSSL=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&connectTimeout=20000&tlsVersions=TLSv1.2,TLSv1.3
     username: ${DB_USER:root}
     password: ${DB_PASS:root}
     hikari:
