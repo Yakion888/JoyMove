@@ -14,6 +14,7 @@ com\joymove\service\impl\UserServiceImpl.class
 com\joymove\entity\Medal.class
 com\joymove\controller\CommunityInteractionController.class
 com\joymove\mapper\MedalRecordMapper.class
+com\joymove\config\RateLimitInterceptor$1.class
 com\joymove\config\CacheWarmUp.class
 com\joymove\config\MybatisPlusConfig.class
 com\joymove\dto\GrowthTimelineDTO$TimelineNode.class

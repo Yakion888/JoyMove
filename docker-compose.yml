@@ -1,0 +1,63 @@
+name: joymove
+
+services:
+  # ========== MySQL 8.0 ==========
+  mysql:
+    image: mysql:8.0
+    container_name: joymove-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sports_blog
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./src/main/resources/init-data.sql:/docker-entrypoint-initdb.d/02-init-data.sql
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # ========== Redis 7 ==========
+  redis:
+    image: redis:7-alpine
+    container_name: joymove-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ========== Spring Boot 应用 ==========
+  app:
+    build: .
+    container_name: joymove-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: sports_blog
+      DB_USER: root
+      DB_PASS: root
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+volumes:
+  mysql-data:
+  redis-data:

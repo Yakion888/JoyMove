@@ -66,6 +66,7 @@ C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\controller\api\Fa
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\mapper\FamilyMomentMapper.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\controller\view\AdminController.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\entity\FamilyMoment.java
+C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\config\RateLimitInterceptor.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\config\RestTemplateConfig.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\mapper\FamilyPlanMapper.java
 C:\Users\19429\Desktop\ai编程\悦动宝\src\main\java\com\joymove\config\MybatisPlusConfig.java

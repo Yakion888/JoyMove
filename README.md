@@ -5,8 +5,9 @@
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-2.7.18-6DB33F?logo=springboot)](https://spring.io/)
 [![Java](https://img.shields.io/badge/Java-8-orange)](https://www.java.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql)](https://www.mysql.com/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-✓-2496ED?logo=docker)](https://www.docker.com/)
 [![DeepSeek](https://img.shields.io/badge/AI-DeepSeek_V4-4B32C3)](https://deepseek.com/)
-[![ECharts](https://img.shields.io/badge/ECharts-5.4-AA344D)](https://echarts.apache.org/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
@@ -70,7 +71,17 @@
 
 ---
 
-## 🚀 3 步快速启动
+## 🐳 Docker 部署（推荐）
+
+```bash
+docker-compose up --build
+```
+
+三容器编排（MySQL + Redis + App），首次构建 5-10 分钟。启动后 `http://localhost:8080`。
+
+---
+
+## 🚀 本机开发启动
 
 ### 前置条件
 - JDK 1.8+
@@ -237,10 +248,14 @@ src/main/java/com/sportsblog/
 | 后端框架 | Spring Boot | 2.7.18 |
 | ORM | MyBatis-Plus | 3.5.5 |
 | 数据库 | MySQL | 8.0 |
+| 缓存 | Redis + Spring Cache | 7 |
 | 安全 | Spring Security + BCrypt | — |
+| 异步 | @Async + 自定义线程池 | — |
+| API 文档 | springdoc-openapi | 1.7.0 |
 | 前端 | Thymeleaf + Bootstrap 5 + jQuery | — |
 | 图表 | ECharts | 5.4 |
-| AI | DeepSeek V4 API | — |
+| AI | DeepSeek API | — |
+| 容器 | Docker + docker-compose | — |
 | 构建 | Maven | 3.6+ |
 | Java | JDK | 1.8 |
 
@@ -257,9 +272,8 @@ src/main/java/com/sportsblog/
 
 ## 📝 待办
 
-- [ ] 执行 `railway up` 完成公网部署（详见 [DEPLOY.md](DEPLOY.md)）
-- [ ] 补充 Prompt 工程文档
-- [ ] 单元测试覆盖核心 Service
+- [ ] 补充 AI Prompt 工程文档
+- [ ] Service 层单元测试补充
 
 ---
 

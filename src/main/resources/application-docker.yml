@@ -1,0 +1,41 @@
+# =============================================
+# Docker 环境配置
+# =============================================
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:sports_blog}?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USER:root}
+    password: ${DB_PASS:root}
+
+  redis:
+    host: ${REDIS_HOST:redis}
+    port: ${REDIS_PORT:6379}
+
+  thymeleaf:
+    cache: true
+
+  devtools:
+    restart:
+      enabled: false
+
+  sql:
+    init:
+      mode: never
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+logging:
+  level:
+    com.joymove: info
+    org.springframework.security: warn
+
+deepseek:
+  api:
+    key: ${DEEPSEEK_API_KEY:sk-demo}
+    url: https://api.deepseek.com/v1/chat/completions
