@@ -50,8 +50,8 @@ public class SecurityConfig {
                 .antMatchers("/register", "/login", "/doLogin", "/api/auth/register").permitAll()
                 // 静态资源
                 .antMatchers("/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
-                // 首页 & 搜索
-                .antMatchers("/", "/index", "/search").permitAll()
+                // 首页 & 搜索 & 健康检查
+                .antMatchers("/", "/index", "/search", "/health").permitAll()
                 // 运动记录详情（公开浏览）
                 .antMatchers("/moment/**").permitAll()
                 // 运动项目库（公开浏览）
