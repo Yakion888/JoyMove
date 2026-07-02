@@ -11,10 +11,10 @@ spring:
     username: ${DB_USER:root}
     password: ${DB_PASS:root}
     hikari:
-      initialization-fail-timeout: -1
+      initialization-fail-timeout: 20000
       maximum-pool-size: 3
       minimum-idle: 0
-      connection-timeout: 60000
+      connection-timeout: 20000
 
   redis:
     host: ${REDIS_HOST:redis}
