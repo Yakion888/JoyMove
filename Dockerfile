@@ -18,4 +18,4 @@ RUN apk add --no-cache tzdata curl && \
     echo "Asia/Shanghai" > /etc/timezone
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=docker", "app.jar"]
+ENTRYPOINT ["java", "-Xmx256m", "-Xms128m", "-XX:MaxMetaspaceSize=128m", "-XX:+UseSerialGC", "-jar", "-Dspring.profiles.active=docker", "app.jar"]
