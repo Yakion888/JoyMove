@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +41,13 @@ public class CacheConfig {
 
     @Bean
     @Primary
-    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    public CacheManager cacheManager(ObjectProvider<RedisConnectionFactory> redisProvider) {
+        RedisConnectionFactory connectionFactory = redisProvider.getIfAvailable();
+        if (connectionFactory == null) {
+            log.warn("Redis 不可用，降级为本地缓存");
+            return new ConcurrentMapCacheManager();
+        }
+
         Map<String, RedisCacheConfiguration> configs = new HashMap<>();
         configs.put("sportProject", eternalCacheConfig());
         configs.put("medal", eternalCacheConfig());

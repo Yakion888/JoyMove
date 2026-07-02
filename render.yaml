@@ -16,7 +16,7 @@ services:
       - key: DB_PASS
         sync: false
       - key: REDIS_HOST
-        sync: false
+        value: ""
       - key: REDIS_PORT
         value: "6379"
       - key: DEEPSEEK_API_KEY
